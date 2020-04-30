@@ -23,6 +23,16 @@
     <div class="container-fluid page__container">
         <div class="row">
             <div class="card col-lg-8 col-md-8" >
+                @if (Session::has('successmessage'))
+                <div class="alert alert-success">
+                    {{ Session::get('successmessage') }}
+                </div>
+                @endif
+                @error('user_id')
+                <div class="alert alert-danger">
+                    {{ $message }}
+                </div>
+                @enderror
                 <div class="card-header bg-primary text-white">
                     Users who can be admins
                 </div>
@@ -48,6 +58,7 @@
                             </thead>
                             <tbody class="list" id="staff02">
                                 @foreach ($users as $user)
+                                @if ($user->isAdmin == null || $user->isAdmin->count() <= 0)
                                 <tr>
     
                                     <td>
@@ -66,12 +77,19 @@
                                             <i class="material-icons">more_vert</i>
                                         </div>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item" href="#">Action</a>
-                                            <a class="dropdown-item" href="#">Another action</a>
+                                            <a class="dropdown-item" href="#" onclick="event.preventDefault();
+                                            document.getElementById('make-admin-form').submit();""> Make admin </a>
+                                            <a class="dropdown-item" href="#">Add teacher info</a>
                                             <a class="dropdown-item" href="#">Something else here</a>
                                           </div>
+                                        <form action="{{route('make-user-admin')}}" method="POST" id="make-admin-form">
+                                            @csrf
+                                            <input type="hidden" value="{{$user->id}}" name="user_id">
+                                        </form>
                                     </td>
                                 </tr>
+                                @endif
+                                
                                 @endforeach
                                 
     

@@ -10,6 +10,7 @@ use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Mail\Message;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Redirect;
@@ -113,5 +114,39 @@ class AdminController extends Controller
         
         $account = $request->usertype == 1 ? " Teacher " : " Adminstrator ";
         return Redirect::back()->with('successmessage', 'successfully created new'.$account." account ");
+    }
+
+    public function OpenInstructorsList(Request $request)
+    {
+        // $instructors =
+    }
+    public function AddUserToAdminGroup(Request $request)
+    {
+        $rules = [
+            "user_id" => ["required", "integer"]
+        ];
+
+        $is_valid = $request->validate($rules);
+
+        $user = User::where('id', $request->user_id)->get();
+        if($user->count() < 1)
+            return Redirect::back()->withErrors(['user_id'=> 'The given user cannot be added to admin group.']);
+        if($user[0]->id == $request->user_id)
+        {
+            $user[0]->RegisterAsAdmin([
+                "student_permission" => 0,
+                "instructor_permission" => 0,
+                "course_permission" => 0,
+                "admin_permission" => 0,
+                "blog_permission" => 0,
+                "kb_permission" => 0, //knowledge base
+                "settings_permission" => 0,
+                "forum_permission" => 0,
+            ]);
+
+            return Redirect::back()->with('successmessage', 'Successfully added '.$user[0]->name.' to admin group');
+        }
+
+        return Redirect::back()->withErrors(['user_id'=> 'The user you are tring to make an admin could not be verified ']);
     }
 }

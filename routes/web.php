@@ -27,7 +27,9 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/users', 'admin\AdminController@openUsersList');
             Route::prefix('/accounts')->group(function(){
                 Route::post('/new', 'admin\AdminController@NewTeacherOrAdminAccount')->name('create-teacher-admin');
+                Route::post('/new/admin', 'admin\AdminController@AddUserToAdminGroup')->name('make-user-admin');
             });
+            Route::get('/instructors', 'admin\AdminController@OpenInstructorsList');
         });
     });
 
