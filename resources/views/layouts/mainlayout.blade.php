@@ -280,7 +280,6 @@
                                             <strong class="h5 m-0">{{Auth::user()->name}}</strong>
                                         </small>
                                     </span>
-
                                 </div>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item d-flex align-items-center py-2" href="/account">
@@ -349,7 +348,7 @@
                                             <small class="text-muted text-uppercase">
                                                 
                                                 <strong>{{Auth::user()->name}}</strong>
-                                                {{Auth::user()->is_student ? "Student" : "Instructor"}}
+                                                {{Auth::user()->is_student ? "Student" : Auth::user()->isAdmin ? "Admin": "Instructor"}}
                                             </small>
                                         </span>
                                     </a>
@@ -391,6 +390,9 @@
                                 @if (Auth::user()->is_student)
                                     
                                 @include('layouts.studentbar')
+                                @elseif(Auth::user()->isAdmin)
+                                    
+                                    @include('layouts.adminbar')
                                 @else
 
                                 @include('layouts.instructorbar')
@@ -619,7 +621,7 @@
     <!-- App Settings (safe to remove) -->
     <script src="/assets/js/app-settings.js"></script>
 
-
+    @yield('scripts')
 
 
 </body>

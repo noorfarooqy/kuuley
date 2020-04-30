@@ -19,7 +19,17 @@ Route::get('/', function () {
 });
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', 'HomeController@openDashboard');
-    
+
+    Route::middleware(['admin_auth'])->group(function () {
+        Route::prefix('/admin')->group(function(){
+            Route::get('/', 'admin\AdminController@openDashBoard');
+            Route::get('/dashboard', 'admin\AdminController@openDashBoard');
+            Route::get('/users', 'admin\AdminController@openUsersList');
+            Route::prefix('/accounts')->group(function(){
+                Route::post('/new', 'admin\AdminController@NewTeacherOrAdminAccount')->name('create-teacher-admin');
+            });
+        });
+    });
 
 });
 Route::get('/home', 'HomeController@index')->name('home');
