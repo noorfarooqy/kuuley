@@ -28,10 +28,18 @@ Route::middleware(['auth'])->group(function () {
             Route::prefix('/accounts')->group(function(){
                 Route::post('/new', 'admin\AdminController@NewTeacherOrAdminAccount')->name('create-teacher-admin');
                 Route::post('/new/admin', 'admin\AdminController@AddUserToAdminGroup')->name('make-user-admin');
+                Route::prefix('/inst')->group(function(){
+                    Route::get('/{user_id}', 'admin\AdminController@ViewInstructorInfo');
+                    Route::post('/update/{inst_id}', 'instructor\InstructorController@UpdateBasicInfo');
+                    Route::post('/update/address/{inst_id}', 'instructor\InstructorController@UpdateAddressInfo');
+                    Route::post('/update/social/{inst_id}', 'instructor\InstructorController@UpdateSocialInfo');
+                });
+                
             });
             Route::get('/instructors', 'admin\AdminController@OpenInstructorsList');
         });
     });
+
 
 });
 Route::get('/home', 'HomeController@index')->name('home');

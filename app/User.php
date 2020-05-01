@@ -3,6 +3,7 @@
 namespace App;
 
 use App\models\admin\AdminsModel;
+use App\models\instructors\InstructorModel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -67,5 +68,15 @@ class User extends Authenticatable
             "settings_permission"  => $permissions['settings_permission'],
             "forum_permission"  => $permissions['forum_permission'],
         ]);
+    }
+
+
+    public function InstructorInfo()
+    {
+        return $this->hasOne(InstructorModel::class, 'instructor_id', 'id');
+    }
+    public function HasInstructorInfo()
+    {
+        return $this->InstructorInfo()->count() > 0;
     }
 }

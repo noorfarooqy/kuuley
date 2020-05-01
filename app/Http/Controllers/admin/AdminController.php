@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\models\misc\CountryModel;
 use App\models\misc\PasswordResetModel;
 use App\Notifications\admin\NewAdminNotification;
 use App\Notifications\teachers\NewTeacherNotification;
@@ -21,13 +22,7 @@ class AdminController extends Controller
     protected $student_permission;
     protected $instructor_permission;
 
-    protected $perm_none = 0; //no permission
-    protected $perm_read = 10; // permission to read resources
-    protected $perm_write = 20; //permission to write/create resource
-    protected $perm_edit = 30; //permission to edit resources
-    protected $perm_delete = 40; //permission to delete resources
-    protected $perm_diactivate = 50; //permission to deactivate resources
-    protected $perm_activate = 60; //permission to activate resources
+    
 
     public function __construct()
     {
@@ -41,6 +36,10 @@ class AdminController extends Controller
 
     public function openUsersList(Request $request)
     {
+
+        $admin = $request->user()->isAdmin;
+        if($admin->admin_permission < $admin->perm_read)
+            abort(403);
         $users = User::where([
             ["is_student", false],
             ["id", "!=", $request->user()->id],
@@ -67,6 +66,9 @@ class AdminController extends Controller
     public function NewTeacherOrAdminAccount(Request $request)
     {
         
+        $admin = $request->user()->isAdmin;
+        if($admin->admin_permission < $admin->perm_write)
+            abort(403);
         $rules =  [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
@@ -122,6 +124,10 @@ class AdminController extends Controller
     }
     public function AddUserToAdminGroup(Request $request)
     {
+
+        $admin = $request->user()->isAdmin;
+        if($admin->admin_permission < $admin->perm_activate)
+            abort(403);
         $rules = [
             "user_id" => ["required", "integer"]
         ];
@@ -149,4 +155,20 @@ class AdminController extends Controller
 
         return Redirect::back()->withErrors(['user_id'=> 'The user you are tring to make an admin could not be verified ']);
     }
+
+    public function ViewInstructorInfo(Request $request, $user_id)
+    {
+        $admin = $request->user()->isAdmin;
+        if($admin->instructor_permission < $admin->perm_write)
+            abort(403);
+        $user = User::where('id', $user_id)->get();
+        if($user->count() <= 0)
+            abort(404);
+        $user = $user[0];
+        $countries = CountryModel::all();
+        return view('instructor.update_info', compact('user', 'countries'));
+    }
+
+
+    
 }

@@ -79,7 +79,7 @@
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                             <a class="dropdown-item" href="#" onclick="event.preventDefault();
                                             document.getElementById('make-admin-form').submit();""> Make admin </a>
-                                            <a class="dropdown-item" href="#">Add teacher info</a>
+                                            <a class="dropdown-item" href="/admin/accounts/inst/{{$user->id}}">Add teacher info</a>
                                             <a class="dropdown-item" href="#">Something else here</a>
                                           </div>
                                         <form action="{{route('make-user-admin')}}" method="POST" id="make-admin-form">

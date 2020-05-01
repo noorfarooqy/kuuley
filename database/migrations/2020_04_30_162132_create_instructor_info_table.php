@@ -19,15 +19,21 @@ class CreateInstructorInfoTable extends Migration
             $table->string('inst_firstname');
             $table->string('inst_secondname');
             $table->string('inst_lastname');
-            $table->string('inst_living_country');
-            $table->string('inst_living_city');
-            $table->string('inst_living_address');
-            $table->string('inst_nationality');
-            $table->string('inst_telephone');
+            $table->string('inst_biography',1200)->nullable();
+            $table->string('inst_living_country')->nullable();
+            $table->string('inst_living_city')->nullable();
+            $table->string('inst_living_address')->nullable();
+            $table->string('inst_nationality')->nullable();
+            $table->string('inst_telephone')->nullable();
             $table->string('inst_telephone_two')->nullable();
             $table->boolean('inst_is_female')->default(true);
-            $table->string('inst_specialization');
+            $table->string('inst_specialization')->nullable();
             $table->boolean('inst_is_active')->default(false);
+            $table->string('inst_fb')->nullable();
+            $table->string('inst_twitter')->nullable();
+            $table->string('inst_linkedin')->nullable();
+            $table->string('inst_github')->nullable();
+            $table->string('inst_youtube')->nullable();
             $table->timestamps();
         });
     }
