@@ -22,5 +22,10 @@
         "sass-loader": "^8.0.0",
         "vue": "^2.5.17",
         "vue-template-compiler": "^2.6.10"
+    },
+    "dependencies": {
+        "animejs": "^3.2.0",
+        "mathjax": "^3.0.5",
+        "vue-mathjax": "0.0.11"
     }
 }

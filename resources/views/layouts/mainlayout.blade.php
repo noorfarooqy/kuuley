@@ -29,6 +29,7 @@
     <link type="text/css" href="/assets/css/vendor-ion-rangeslider.css" rel="stylesheet">
     <link type="text/css" href="/assets/css/vendor-ion-rangeslider.rtl.css" rel="stylesheet">
 
+    @yield('links')
 
 
 
@@ -316,7 +317,7 @@
         <!-- // END Header -->
 
         <!-- Header Layout Content -->
-        <div class="mdk-header-layout__content">
+        <div class="mdk-header-layout__content" id="app">
 
             <div class="mdk-drawer-layout js-mdk-drawer-layout" data-push data-responsive-width="992px">
                 <div class="mdk-drawer-layout__content page">

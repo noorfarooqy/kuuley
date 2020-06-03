@@ -2,6 +2,7 @@
 
 namespace App\models\instructors;
 
+use App\User;
 use Illuminate\Database\Eloquent\Model;
 
 class InstructorModel extends Model
@@ -79,5 +80,9 @@ class InstructorModel extends Model
             "inst_is_female" => $data['gender'] == 1,
             "inst_specialization" => $data['profession'],
         ]);
+    }
+    public function UserInfo()
+    {
+        return $this->belongsTo(User::class, 'instructor_id', 'id');
     }
 }

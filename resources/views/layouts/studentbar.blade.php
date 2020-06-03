@@ -5,7 +5,7 @@
 
 
                                     <li class="sidebar-menu-item">
-                                        <a class="sidebar-menu-button" href="student-dashboard.html">
+                                        <a class="sidebar-menu-button" href="/student/dashboard">
                                             <span class="sidebar-menu-icon sidebar-menu-icon--left">
                                                 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 40 40" width="22" height="22">
                                                     <g transform="matrix(1.6666666666666667,0,0,1.6666666666666667,0,0)">
@@ -19,7 +19,7 @@
 
 
                                     <li class="sidebar-menu-item">
-                                        <a class="sidebar-menu-button" href="student-series.html">
+                                        <a class="sidebar-menu-button" href="/student/series">
                                             <span class="sidebar-menu-icon sidebar-menu-icon--left">
                                                 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 40 40" width="22" height="22">
                                                     <g transform="matrix(1.6666666666666667,0,0,1.6666666666666667,0,0)">
@@ -32,7 +32,7 @@
                                     </li>
 
                                     <li class="sidebar-menu-item">
-                                        <a class="sidebar-menu-button" href="student-courses.html">
+                                        <a class="sidebar-menu-button" href="/student/courses">
                                             <span class="sidebar-menu-icon sidebar-menu-icon--left">
                                                 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 40 40" width="22" height="22">
                                                     <g transform="matrix(1.6666666666666667,0,0,1.6666666666666667,0,0)">
@@ -60,7 +60,7 @@
 
 
                                     <li class="sidebar-menu-item">
-                                        <a class="sidebar-menu-button" href="student-take-course.html">
+                                        <a class="sidebar-menu-button" href="/courses">
                                             <span class="sidebar-menu-icon sidebar-menu-icon--left">
                                                 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 40 40" width="22" height="22">
                                                     <g transform="matrix(1.6666666666666667,0,0,1.6666666666666667,0,0)">
@@ -73,7 +73,7 @@
                                     </li>
 
                                     <li class="sidebar-menu-item">
-                                        <a class="sidebar-menu-button" href="student-take-quiz.html">
+                                        <a class="sidebar-menu-button" href="student/quiz">
                                             <span class="sidebar-menu-icon sidebar-menu-icon--left">
                                                 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 40 40" width="22" height="22">
                                                     <g transform="matrix(1.6666666666666667,0,0,1.6666666666666667,0,0)">
@@ -87,7 +87,7 @@
 
 
                                     <li class="sidebar-menu-item">
-                                        <a class="sidebar-menu-button" href="student-billing.html">
+                                        <a class="sidebar-menu-button" href="student/billing">
                                             <span class="sidebar-menu-icon sidebar-menu-icon--left">
                                                 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 40 40" width="22" height="22">
                                                     <g transform="matrix(1.6666666666666667,0,0,1.6666666666666667,0,0)">
@@ -101,7 +101,7 @@
 
 
                                     <li class="sidebar-menu-item">
-                                        <a class="sidebar-menu-button" href="student-edit-account.html">
+                                        <a class="sidebar-menu-button" href="/student/account">
                                             <span class="sidebar-menu-icon sidebar-menu-icon--left">
                                                 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 40 40" width="22" height="22">
                                                     <g transform="matrix(1.6666666666666667,0,0,1.6666666666666667,0,0)">
@@ -115,7 +115,7 @@
 
 
                                     <li class="sidebar-menu-item">
-                                        <a class="sidebar-menu-button" href="student-profile.html">
+                                        <a class="sidebar-menu-button" href="/student/profile">
                                             <span class="sidebar-menu-icon sidebar-menu-icon--left">
                                                 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 40 40" width="22" height="22">
                                                     <g transform="matrix(1.6666666666666667,0,0,1.6666666666666667,0,0)">

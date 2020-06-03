@@ -19,27 +19,50 @@ Route::get('/', function () {
 });
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', 'HomeController@openDashboard');
-
+    Route::post('/upload/save', 'misc\UploadedFilesController@UploadNewFile');
+    Route::post('/upload/remove', 'misc\UploadedFilesController@RemoveFile');
     Route::middleware(['admin_auth'])->group(function () {
-        Route::prefix('/admin')->group(function(){
+        Route::prefix('/admin')->group(function () {
             Route::get('/', 'admin\AdminController@openDashBoard');
             Route::get('/dashboard', 'admin\AdminController@openDashBoard');
             Route::get('/users', 'admin\AdminController@openUsersList');
-            Route::prefix('/accounts')->group(function(){
+            Route::prefix('/accounts')->group(function () {
                 Route::post('/new', 'admin\AdminController@NewTeacherOrAdminAccount')->name('create-teacher-admin');
                 Route::post('/new/admin', 'admin\AdminController@AddUserToAdminGroup')->name('make-user-admin');
-                Route::prefix('/inst')->group(function(){
+                Route::prefix('/inst')->group(function () {
                     Route::get('/{user_id}', 'admin\AdminController@ViewInstructorInfo');
                     Route::post('/update/{inst_id}', 'instructor\InstructorController@UpdateBasicInfo');
                     Route::post('/update/address/{inst_id}', 'instructor\InstructorController@UpdateAddressInfo');
                     Route::post('/update/social/{inst_id}', 'instructor\InstructorController@UpdateSocialInfo');
                 });
-                
+
+            });
+            Route::prefix('/student')->group(function () {
+                Route::get('/list', 'admin\AdminController@ViewStudentsList');
+                Route::get('/{student_id}', 'admin\AdminController@ViewStudentInfo');
+            });
+            Route::prefix('/cat')->group(function () {
+                Route::post('/new', 'courses\CourseController@NewCourseCategory');
+                Route::get('/{student_id}', 'admin\AdminController@ViewStudentInfo');
+            });
+            Route::prefix('/quiz')->group(function () {
+                Route::get('/', 'quiz\QuizController@ViewQuizIndexPage');
+                Route::post('/new', 'courses\CourseController@NewCourseCategory');
+                Route::get('/{student_id}', 'admin\AdminController@ViewStudentInfo');
+            });
+            Route::prefix('/courses')->group(function () {
+                Route::get('/', 'admin\AdminController@ViewCoursesPage');
+                Route::get('/new', 'courses\CourseController@AddNewCoursePage');
+                Route::post('/new', 'courses\CourseController@AddNewCourse');
+                Route::get('/list', 'courses\CourseController@ViewCoursesList');
+                Route::get('/list/inactive', 'courses\CourseController@ViewInactiveCourses');
+                Route::get('/{course_id}', 'courses\CourseController@ViewCoursesGiven');
+                Route::post('/{course_id}/update', 'courses\CourseController@UpdateCoursesGiven');
             });
             Route::get('/instructors', 'admin\AdminController@OpenInstructorsList');
+            
         });
     });
-
-
+    
 });
 Route::get('/home', 'HomeController@index')->name('home');
