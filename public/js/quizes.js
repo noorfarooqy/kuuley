@@ -3203,7 +3203,9 @@ module.exports = {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue_mathjax__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue-mathjax */ "./node_modules/vue-mathjax/index.js");
-//
+/* harmony import */ var _signs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./signs */ "./resources/js/quizes/signs.js");
+/* harmony import */ var _single_choice_question__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./single_choice_question */ "./resources/js/quizes/single_choice_question.js");
+/* harmony import */ var _Answers__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Answers */ "./resources/js/quizes/Answers.js");
 //
 //
 //
@@ -3267,27 +3269,51 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 
+
+
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       name: 'maths-vue',
       version: '1.0',
-      formula: '$$x = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$'
+      formula: '',
+      Signs: new _signs__WEBPACK_IMPORTED_MODULE_1__["default"](),
+      SingleChoiceQuiz: new _single_choice_question__WEBPACK_IMPORTED_MODULE_2__["default"]()
     };
   },
   mounted: function mounted() {
     // alert('maths is ready');
     console.log('math is ready');
+    this.SingleChoiceQuiz.question_text = 'This my question';
+    this.SingleChoiceQuiz.answers.push(new _Answers__WEBPACK_IMPORTED_MODULE_3__["default"]('Answer 1', true));
   },
   methods: {
     GetMathsPreview: function GetMathsPreview() {
       // MathJax.textReset();
-      return this.math_text;
+      return '$$ ' + this.formula + ' $$';
+    },
+    addFormula: function addFormula(sign) {
+      console.log('acitve aelemtn ', this.$refs.formula); // pos = ;
+
+      console.log('postion ', this.$refs.formula.selectionEnd);
+      this.typeInTextarea(sign, this.$refs.formula);
+    },
+    typeInTextarea: function typeInTextarea(newText) {
+      var el = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : document.activeElement;
+      var _ref = [el.selectionStart, el.selectionEnd],
+          start = _ref[0],
+          end = _ref[1];
+      console.log(' start ', start, ' end  ', end);
+      el.setRangeText(newText + ' ', start, end, 'select');
+      el.focus();
+      el.setSelectionRange(el.selectionEnd, el.selectionEnd + 2, 'forward');
     }
   },
   components: {
     'vue-mathjax': vue_mathjax__WEBPACK_IMPORTED_MODULE_0__["VueMathjax"]
-  }
+  },
+  props: ['type']
 });
 
 /***/ }),
@@ -38940,7 +38966,254 @@ var render = function() {
     "div",
     { staticClass: "maths-div" },
     [
-      _vm._m(0),
+      _c(
+        "div",
+        {
+          staticClass: "form-group mb-3 border-dark p-2 ",
+          staticStyle: { border: "thin solid gray" }
+        },
+        [
+          _c("img", {
+            staticClass: "p-1 pointer",
+            staticStyle: { border: "thin solid rgb(240, 218, 218)" },
+            attrs: {
+              src: "/assets/math_icons/plus.png",
+              height: "20",
+              alt: ""
+            },
+            on: {
+              click: function($event) {
+                $event.preventDefault()
+                return _vm.addFormula(_vm.Signs.sign_plus)
+              }
+            }
+          }),
+          _vm._v(" "),
+          _c("img", {
+            staticClass: "p-1",
+            staticStyle: { border: "thin solid rgb(240, 218, 218)" },
+            attrs: {
+              src: "/assets/math_icons/minus.png",
+              height: "20",
+              alt: ""
+            },
+            on: {
+              click: function($event) {
+                $event.preventDefault()
+                return _vm.addFormula(_vm.Signs.sign_minus)
+              }
+            }
+          }),
+          _vm._v(" "),
+          _c("img", {
+            staticClass: "p-1",
+            staticStyle: { border: "thin solid rgb(240, 218, 218)" },
+            attrs: {
+              src: "/assets/math_icons/divide.png",
+              height: "20",
+              alt: ""
+            },
+            on: {
+              click: function($event) {
+                $event.preventDefault()
+                return _vm.addFormula(_vm.Signs.sign_divide)
+              }
+            }
+          }),
+          _vm._v(" "),
+          _c("img", {
+            staticClass: "p-1",
+            staticStyle: { border: "thin solid rgb(240, 218, 218)" },
+            attrs: {
+              src: "/assets/math_icons/multiply.png",
+              height: "20",
+              alt: ""
+            },
+            on: {
+              click: function($event) {
+                $event.preventDefault()
+                return _vm.addFormula(_vm.Signs.sign_times)
+              }
+            }
+          }),
+          _vm._v(" "),
+          _c("img", {
+            staticClass: "p-1",
+            staticStyle: { border: "thin solid rgb(240, 218, 218)" },
+            attrs: {
+              src: "/assets/math_icons/fraction.png",
+              height: "20",
+              alt: ""
+            },
+            on: {
+              click: function($event) {
+                $event.preventDefault()
+                return _vm.addFormula(_vm.Signs.sign_percentage)
+              }
+            }
+          }),
+          _vm._v(" "),
+          _c("img", {
+            staticClass: "p-1",
+            staticStyle: { border: "thin solid rgb(240, 218, 218)" },
+            attrs: {
+              src: "/assets/math_icons/equal.png",
+              height: "20",
+              alt: ""
+            },
+            on: {
+              click: function($event) {
+                $event.preventDefault()
+                return _vm.addFormula(_vm.Signs.sign_equal)
+              }
+            }
+          }),
+          _vm._v(" "),
+          _c("img", {
+            staticClass: "p-1",
+            staticStyle: { border: "thin solid rgb(240, 218, 218)" },
+            attrs: {
+              src: "/assets/math_icons/division_2.png",
+              height: "20",
+              alt: ""
+            },
+            on: {
+              click: function($event) {
+                $event.preventDefault()
+                return _vm.addFormula(_vm.Signs.sign_square_root)
+              }
+            }
+          }),
+          _vm._v(" "),
+          _c("img", {
+            staticClass: "p-1",
+            staticStyle: { border: "thin solid rgb(240, 218, 218)" },
+            attrs: {
+              src: "/assets/math_icons/lessthan.png",
+              height: "20",
+              alt: ""
+            },
+            on: {
+              click: function($event) {
+                $event.preventDefault()
+                return _vm.addFormula(_vm.Signs.sign_lessthan)
+              }
+            }
+          }),
+          _vm._v(" "),
+          _c("img", {
+            staticClass: "p-1",
+            staticStyle: { border: "thin solid rgb(240, 218, 218)" },
+            attrs: {
+              src: "/assets/math_icons/greaterthan.png",
+              height: "20",
+              alt: ""
+            },
+            on: {
+              click: function($event) {
+                $event.preventDefault()
+                return _vm.addFormula(_vm.Signs.sign_greaterthan)
+              }
+            }
+          }),
+          _vm._v(" "),
+          _c("img", {
+            staticClass: "p-1",
+            staticStyle: { border: "thin solid rgb(240, 218, 218)" },
+            attrs: {
+              src: "/assets/math_icons/lessthan_equalto.png",
+              height: "20",
+              alt: ""
+            },
+            on: {
+              click: function($event) {
+                $event.preventDefault()
+                return _vm.addFormula(_vm.Signs.sign_lessthan_equalto)
+              }
+            }
+          }),
+          _vm._v(" "),
+          _c("img", {
+            staticClass: "p-1",
+            staticStyle: { border: "thin solid rgb(240, 218, 218)" },
+            attrs: {
+              src: "/assets/math_icons/lgreaterthan_equalto.png",
+              height: "20",
+              alt: ""
+            },
+            on: {
+              click: function($event) {
+                $event.preventDefault()
+                return _vm.addFormula(_vm.Signs.sign_greaterthan_equalto)
+              }
+            }
+          }),
+          _vm._v(" "),
+          _c("img", {
+            staticClass: "p-1",
+            staticStyle: { border: "thin solid rgb(240, 218, 218)" },
+            attrs: {
+              src: "/assets/math_icons/notequal.png",
+              height: "20",
+              alt: ""
+            },
+            on: {
+              click: function($event) {
+                $event.preventDefault()
+                return _vm.addFormula(_vm.Signs.sign_not_equal)
+              }
+            }
+          }),
+          _vm._v(" "),
+          _c("img", {
+            staticClass: "p-1",
+            staticStyle: { border: "thin solid rgb(240, 218, 218)" },
+            attrs: {
+              src: "/assets/math_icons/power.png",
+              height: "20",
+              alt: ""
+            },
+            on: {
+              click: function($event) {
+                $event.preventDefault()
+                return _vm.addFormula(_vm.Signs.sign_power)
+              }
+            }
+          }),
+          _vm._v(" "),
+          _c("img", {
+            staticClass: "p-1",
+            staticStyle: { border: "thin solid rgb(240, 218, 218)" },
+            attrs: {
+              src: "/assets/math_icons/times.png",
+              height: "20",
+              alt: ""
+            },
+            on: {
+              click: function($event) {
+                $event.preventDefault()
+                return _vm.addFormula(_vm.Signs.sign_ast)
+              }
+            }
+          }),
+          _vm._v(" "),
+          _c("img", {
+            staticClass: "p-1",
+            staticStyle: { border: "thin solid rgb(240, 218, 218)" },
+            attrs: {
+              src: "/assets/math_icons/plus_minus.png",
+              height: "20",
+              alt: ""
+            },
+            on: {
+              click: function($event) {
+                $event.preventDefault()
+                return _vm.addFormula(_vm.Signs.sign_pm)
+              }
+            }
+          })
+        ]
+      ),
       _vm._v(" "),
       _c("div", { staticClass: "form-group mb-3" }, [
         _c("label", { staticClass: "control-label h6" }, [
@@ -38956,6 +39229,7 @@ var render = function() {
               expression: "formula"
             }
           ],
+          ref: "formula",
           staticClass: "form-control",
           attrs: {
             placeholder: "Question text",
@@ -38974,9 +39248,66 @@ var render = function() {
         })
       ]),
       _vm._v(" "),
-      _c("vue-mathjax", { attrs: { formula: _vm.formula } }),
+      _c("vue-mathjax", { attrs: { formula: _vm.GetMathsPreview() } }),
       _vm._v(" "),
-      _vm._m(1)
+      _vm.type == 1
+        ? _c("div", { staticClass: "flex" }, [
+            _c("label", { attrs: { for: "subscribe" } }, [
+              _vm._v("Select if answer is true")
+            ]),
+            _c("br"),
+            _vm._v(" "),
+            _vm._m(0),
+            _vm._v(" "),
+            _c("label", { staticClass: "mb-0", attrs: { for: "subscribe" } }, [
+              _vm._v("True")
+            ])
+          ])
+        : _vm._e(),
+      _vm._v(" "),
+      _vm.type == 2
+        ? _c(
+            "ul",
+            { staticClass: "list-group", attrs: { id: "answer_container_1" } },
+            _vm._l(_vm.SingleChoiceQuiz.answers, function(answer, akey) {
+              return _c(
+                "li",
+                {
+                  key: akey,
+                  staticClass: "list-group-item d-flex",
+                  attrs: {
+                    "data-position": "1",
+                    "data-answer-id": "1",
+                    "data-question-id": "1"
+                  }
+                },
+                [
+                  _vm._m(1, true),
+                  _vm._v(" "),
+                  _c("div", [
+                    _vm._v(
+                      "\n                " +
+                        _vm._s(answer.answer) +
+                        "\n            "
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "ml-auto" }, [
+                    _c("input", {
+                      attrs: {
+                        type: "radio",
+                        name: "question[correct_answer_id]",
+                        id: "correct_answer_6"
+                      },
+                      domProps: { checked: answer.is_correct }
+                    })
+                  ])
+                ]
+              )
+            }),
+            0
+          )
+        : _vm._e()
     ],
     1
   )
@@ -38989,135 +39320,20 @@ var staticRenderFns = [
     return _c(
       "div",
       {
-        staticClass: "form-group mb-3 border-dark p-2 ",
-        staticStyle: { border: "thin solid gray" }
+        staticClass:
+          "custom-control custom-checkbox-toggle custom-control-inline mr-1"
       },
       [
-        _c("img", {
-          staticClass: "p-1",
-          staticStyle: { border: "thin solid rgb(240, 218, 218)" },
-          attrs: { src: "/assets/math_icons/plus.png", height: "20", alt: "" }
+        _c("input", {
+          staticClass: "custom-control-input",
+          attrs: { checked: "", type: "checkbox", id: "subscribe" }
         }),
         _vm._v(" "),
-        _c("img", {
-          staticClass: "p-1",
-          staticStyle: { border: "thin solid rgb(240, 218, 218)" },
-          attrs: { src: "/assets/math_icons/minus.png", height: "20", alt: "" }
-        }),
-        _vm._v(" "),
-        _c("img", {
-          staticClass: "p-1",
-          staticStyle: { border: "thin solid rgb(240, 218, 218)" },
-          attrs: { src: "/assets/math_icons/divide.png", height: "20", alt: "" }
-        }),
-        _vm._v(" "),
-        _c("img", {
-          staticClass: "p-1",
-          staticStyle: { border: "thin solid rgb(240, 218, 218)" },
-          attrs: {
-            src: "/assets/math_icons/multiply.png",
-            height: "20",
-            alt: ""
-          }
-        }),
-        _vm._v(" "),
-        _c("img", {
-          staticClass: "p-1",
-          staticStyle: { border: "thin solid rgb(240, 218, 218)" },
-          attrs: {
-            src: "/assets/math_icons/fraction.png",
-            height: "20",
-            alt: ""
-          }
-        }),
-        _vm._v(" "),
-        _c("img", {
-          staticClass: "p-1",
-          staticStyle: { border: "thin solid rgb(240, 218, 218)" },
-          attrs: { src: "/assets/math_icons/equal.png", height: "20", alt: "" }
-        }),
-        _vm._v(" "),
-        _c("img", {
-          staticClass: "p-1",
-          staticStyle: { border: "thin solid rgb(240, 218, 218)" },
-          attrs: {
-            src: "/assets/math_icons/division_2.png",
-            height: "20",
-            alt: ""
-          }
-        }),
-        _vm._v(" "),
-        _c("img", {
-          staticClass: "p-1",
-          staticStyle: { border: "thin solid rgb(240, 218, 218)" },
-          attrs: {
-            src: "/assets/math_icons/lessthan.png",
-            height: "20",
-            alt: ""
-          }
-        }),
-        _vm._v(" "),
-        _c("img", {
-          staticClass: "p-1",
-          staticStyle: { border: "thin solid rgb(240, 218, 218)" },
-          attrs: {
-            src: "/assets/math_icons/greaterthan.png",
-            height: "20",
-            alt: ""
-          }
-        }),
-        _vm._v(" "),
-        _c("img", {
-          staticClass: "p-1",
-          staticStyle: { border: "thin solid rgb(240, 218, 218)" },
-          attrs: {
-            src: "/assets/math_icons/lessthan_equalto.png",
-            height: "20",
-            alt: ""
-          }
-        }),
-        _vm._v(" "),
-        _c("img", {
-          staticClass: "p-1",
-          staticStyle: { border: "thin solid rgb(240, 218, 218)" },
-          attrs: {
-            src: "/assets/math_icons/lgreaterthan_equalto.png",
-            height: "20",
-            alt: ""
-          }
-        }),
-        _vm._v(" "),
-        _c("img", {
-          staticClass: "p-1",
-          staticStyle: { border: "thin solid rgb(240, 218, 218)" },
-          attrs: {
-            src: "/assets/math_icons/notequal.png",
-            height: "20",
-            alt: ""
-          }
-        }),
-        _vm._v(" "),
-        _c("img", {
-          staticClass: "p-1",
-          staticStyle: { border: "thin solid rgb(240, 218, 218)" },
-          attrs: { src: "/assets/math_icons/power.png", height: "20", alt: "" }
-        }),
-        _vm._v(" "),
-        _c("img", {
-          staticClass: "p-1",
-          staticStyle: { border: "thin solid rgb(240, 218, 218)" },
-          attrs: { src: "/assets/math_icons/times.png", height: "20", alt: "" }
-        }),
-        _vm._v(" "),
-        _c("img", {
-          staticClass: "p-1",
-          staticStyle: { border: "thin solid rgb(240, 218, 218)" },
-          attrs: {
-            src: "/assets/math_icons/plus_minus.png",
-            height: "20",
-            alt: ""
-          }
-        })
+        _c(
+          "label",
+          { staticClass: "custom-control-label", attrs: { for: "subscribe" } },
+          [_vm._v("True")]
+        )
       ]
     )
   },
@@ -39125,74 +39341,11 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c(
-      "ul",
-      { staticClass: "list-group", attrs: { id: "answer_container_1" } },
-      [
-        _c(
-          "li",
-          {
-            staticClass: "list-group-item d-flex",
-            attrs: {
-              "data-position": "1",
-              "data-answer-id": "1",
-              "data-question-id": "1"
-            }
-          },
-          [
-            _c("span", { staticClass: "mr-2" }, [
-              _c("i", { staticClass: "material-icons text-light-gray" }, [
-                _vm._v("menu")
-              ])
-            ]),
-            _vm._v(" "),
-            _c("div", [_vm._v("\n                True\n            ")]),
-            _vm._v(" "),
-            _c("div", { staticClass: "ml-auto" }, [
-              _c("input", {
-                attrs: {
-                  type: "radio",
-                  name: "question[correct_answer_id]",
-                  id: "correct_answer_1"
-                }
-              })
-            ])
-          ]
-        ),
-        _vm._v(" "),
-        _c(
-          "li",
-          {
-            staticClass: "list-group-item d-flex",
-            attrs: {
-              "data-position": "1",
-              "data-answer-id": "1",
-              "data-question-id": "1"
-            }
-          },
-          [
-            _c("span", { staticClass: "mr-2" }, [
-              _c("i", { staticClass: "material-icons text-light-gray" }, [
-                _vm._v("menu")
-              ])
-            ]),
-            _vm._v(" "),
-            _c("div", [_vm._v("\n                False\n            ")]),
-            _vm._v(" "),
-            _c("div", { staticClass: "ml-auto" }, [
-              _c("input", {
-                attrs: {
-                  type: "radio",
-                  name: "question[correct_answer_id]",
-                  id: "correct_answer_1",
-                  checked: ""
-                }
-              })
-            ])
-          ]
-        )
-      ]
-    )
+    return _c("span", { staticClass: "mr-2" }, [
+      _c("i", { staticClass: "material-icons text-light-gray" }, [
+        _vm._v("menu")
+      ])
+    ])
   }
 ]
 render._withStripped = true
@@ -51439,6 +51592,29 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
 
 /***/ }),
 
+/***/ "./resources/js/quizes/Answers.js":
+/*!****************************************!*\
+  !*** ./resources/js/quizes/Answers.js ***!
+  \****************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return _default; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var _default = function _default(answer, is_correct) {
+  _classCallCheck(this, _default);
+
+  this.answer = answer;
+  this.is_correct = is_correct;
+};
+
+
+
+/***/ }),
+
 /***/ "./resources/js/quizes/maths.vue":
 /*!***************************************!*\
   !*** ./resources/js/quizes/maths.vue ***!
@@ -51541,6 +51717,66 @@ var app = new Vue({
     'math-comp': _maths_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
   }
 });
+
+/***/ }),
+
+/***/ "./resources/js/quizes/signs.js":
+/*!**************************************!*\
+  !*** ./resources/js/quizes/signs.js ***!
+  \**************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return _default; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var _default = function _default() {
+  _classCallCheck(this, _default);
+
+  this.sign_plus = '+';
+  this.sign_minus = '-';
+  this.sign_times = '\\times';
+  this.sign_divide = '\\div';
+  this.sign_percentage = '\\%';
+  this.sign_equal = '=';
+  this.sign_square_root = '\\sqrt{ }';
+  this.sign_lessthan = '\\lt';
+  this.sign_lessthan_equalto = '\\le';
+  this.sign_greaterthan = '\\gt';
+  this.sign_greaterthan_equalto = '\\ge';
+  this.sign_equal = '=';
+  this.sign_not_equal = '\\ne';
+  this.sign_power = '^';
+  this.sign_ast = '\\ast';
+  this.sign_pm = '\\pm';
+};
+
+
+
+/***/ }),
+
+/***/ "./resources/js/quizes/single_choice_question.js":
+/*!*******************************************************!*\
+  !*** ./resources/js/quizes/single_choice_question.js ***!
+  \*******************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return _default; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var _default = function _default() {
+  _classCallCheck(this, _default);
+
+  this.question_text = '';
+  this.answers = [];
+};
+
+
 
 /***/ }),
 

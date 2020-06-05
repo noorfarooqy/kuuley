@@ -55,7 +55,8 @@
                                         <form action="#">
                                             
                                                 
-                                            <math-comp></math-comp>
+                                            <math-comp v-bind="{type:1}"></math-comp>
+                                            
                                             <button class="btn btn-primary mt-3"><i class="material-icons">add</i> Create Question</button>
                                         </form>
                                     </div>
@@ -65,7 +66,18 @@
                             </div>
                             <div class="tab-pane fade" id="tab-22">
                                 
-                                
+                                <div class="card">
+                                    <div class="card-body card-form__body">
+                                        <form action="#">
+                                            
+                                                
+                                            <math-comp v-bind="{type:2}"></math-comp>
+                                            
+                                            <button class="btn btn-primary mt-3"><i class="material-icons">add</i> Create Question</button>
+                                        </form>
+                                    </div>
+                                </div>
+
                             </div>
                             <div class="tab-pane fade" id="tab-23">
                                 
