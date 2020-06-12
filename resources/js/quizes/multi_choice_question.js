@@ -1,10 +1,9 @@
 
 import Answer from './Answers';
-export default class {
+import Quiz from "./Quiz";
+export default class extends Quiz {
     constructor(){
-        this.question_text = '';
-        this.answers = [];
-        this.existing_keys = [];
+        super();
     }
     UpdateAnswers(answer){
         var index = this.answers.indexOf(answer);

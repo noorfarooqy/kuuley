@@ -3425,9 +3425,10 @@ __webpack_require__.r(__webpack_exports__);
     RecordAnswer: function RecordAnswer() {
       this.errors = [];
 
-      if (this.QuizQuestion.QuestionIsValid(this.ForumalErrors)) {
+      if (this.QuizQuestion.question_text != null && this.QuizQuestion.question_text.length >= 3) {
+        this.QuizQuestion.NewAnswer(this.formula_answer);
         this.formula_answer = '';
-      } else this.errors.push(this.QuizQuestion.GetErrorMessage()); // if(this.QuizQuestion.question_text == null || this.QuizQuestion.question_text.length <= 0){
+      } else this.errors.push(this.ForumalErrors.formula_incomplete); // if(this.QuizQuestion.question_text == null || this.QuizQuestion.question_text.length <= 0){
       //     this.errors.push(this.ForumalErrors.formula_incomplete);
       // }
       // else if(this.formula_answer == null || this.formula_answer.length <= 0){
@@ -39505,119 +39506,117 @@ var render = function() {
         )
       }),
       _vm._v(" "),
-      _vm.type == 1
-        ? _c(
-            "div",
-            [
-              _c(
-                "formula-icons",
-                _vm._b(
-                  {},
-                  "formula-icons",
-                  { Signs: _vm.Signs, element: _vm.getEditorElement(false) },
-                  false
-                )
-              ),
-              _vm._v(" "),
-              _c("div", { staticClass: "form-group mb-3" }, [
-                _c("label", { staticClass: "control-label h6" }, [
-                  _vm._v("New Question:")
-                ]),
-                _vm._v(" "),
-                _c("textarea", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.QuizQuestion.question_text,
-                      expression: "QuizQuestion.question_text"
-                    }
-                  ],
-                  ref: "formula",
-                  staticClass: "form-control",
-                  attrs: {
-                    placeholder: "Question text",
-                    type: "text",
-                    name: "question[title]"
-                  },
-                  domProps: { value: _vm.QuizQuestion.question_text },
-                  on: {
-                    input: function($event) {
-                      if ($event.target.composing) {
-                        return
-                      }
-                      _vm.$set(
-                        _vm.QuizQuestion,
-                        "question_text",
-                        $event.target.value
-                      )
-                    }
+      _c(
+        "div",
+        [
+          _c(
+            "formula-icons",
+            _vm._b(
+              {},
+              "formula-icons",
+              { Signs: _vm.Signs, element: _vm.getEditorElement(false) },
+              false
+            )
+          ),
+          _vm._v(" "),
+          _c("div", { staticClass: "form-group mb-3" }, [
+            _c("label", { staticClass: "control-label h6" }, [
+              _vm._v("New Question:")
+            ]),
+            _vm._v(" "),
+            _c("textarea", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.QuizQuestion.question_text,
+                  expression: "QuizQuestion.question_text"
+                }
+              ],
+              ref: "formula",
+              staticClass: "form-control",
+              attrs: {
+                placeholder: "Question text",
+                type: "text",
+                name: "question[title]"
+              },
+              domProps: { value: _vm.QuizQuestion.question_text },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
                   }
-                })
-              ]),
-              _vm._v(" "),
-              _c("vue-mathjax", { attrs: { formula: _vm.GetMathsPreview() } }),
-              _vm._v(" "),
-              _vm.type == 1
-                ? _c("div", { staticClass: "flex" }, [
-                    _c("label", { attrs: { for: "subscribe" } }, [
-                      _vm._v("Select if answer is true")
-                    ]),
-                    _c("br"),
-                    _vm._v(" "),
-                    _c(
-                      "div",
-                      {
-                        staticClass:
-                          "custom-control custom-checkbox-toggle custom-control-inline mr-1"
-                      },
-                      [
-                        _vm.QuizQuestion.answer
-                          ? _c("input", {
-                              staticClass: "custom-control-input",
-                              attrs: {
-                                checked: "",
-                                type: "checkbox",
-                                id: "subscribe"
-                              },
-                              on: {
-                                change: function($event) {
-                                  return _vm.UpdateAnswers($event)
-                                }
-                              }
-                            })
-                          : _c("input", {
-                              staticClass: "custom-control-input",
-                              attrs: { type: "checkbox", id: "subscribe" },
-                              on: {
-                                change: function($event) {
-                                  return _vm.UpdateAnswers($event)
-                                }
-                              }
-                            }),
-                        _vm._v(" "),
-                        _c(
-                          "label",
-                          {
-                            staticClass: "custom-control-label",
-                            attrs: { for: "subscribe" }
+                  _vm.$set(
+                    _vm.QuizQuestion,
+                    "question_text",
+                    $event.target.value
+                  )
+                }
+              }
+            })
+          ]),
+          _vm._v(" "),
+          _c("vue-mathjax", { attrs: { formula: _vm.GetMathsPreview() } }),
+          _vm._v(" "),
+          _vm.type == 1
+            ? _c("div", { staticClass: "flex" }, [
+                _c("label", { attrs: { for: "subscribe" } }, [
+                  _vm._v("Select if answer is true")
+                ]),
+                _c("br"),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  {
+                    staticClass:
+                      "custom-control custom-checkbox-toggle custom-control-inline mr-1"
+                  },
+                  [
+                    _vm.QuizQuestion.answer
+                      ? _c("input", {
+                          staticClass: "custom-control-input",
+                          attrs: {
+                            checked: "",
+                            type: "checkbox",
+                            id: "subscribe"
                           },
-                          [_vm._v("True")]
-                        )
-                      ]
-                    ),
+                          on: {
+                            change: function($event) {
+                              return _vm.UpdateAnswers($event)
+                            }
+                          }
+                        })
+                      : _c("input", {
+                          staticClass: "custom-control-input",
+                          attrs: { type: "checkbox", id: "subscribe" },
+                          on: {
+                            change: function($event) {
+                              return _vm.UpdateAnswers($event)
+                            }
+                          }
+                        }),
                     _vm._v(" "),
                     _c(
                       "label",
-                      { staticClass: "mb-0", attrs: { for: "subscribe" } },
+                      {
+                        staticClass: "custom-control-label",
+                        attrs: { for: "subscribe" }
+                      },
                       [_vm._v("True")]
                     )
-                  ])
-                : _vm._e()
-            ],
-            1
-          )
-        : _vm._e(),
+                  ]
+                ),
+                _vm._v(" "),
+                _c(
+                  "label",
+                  { staticClass: "mb-0", attrs: { for: "subscribe" } },
+                  [_vm._v("True")]
+                )
+              ])
+            : _vm._e()
+        ],
+        1
+      ),
       _vm._v(" "),
       _vm.type == 2 || _vm.type == 3
         ? _c("div", [
@@ -39632,8 +39631,8 @@ var render = function() {
                     "formula-icons",
                     {
                       Signs: _vm.Signs,
-                      answer: true,
-                      element: _vm.getEditorElement()
+                      answer: false,
+                      element: _vm.getEditorElement(true)
                     },
                     false
                   )
@@ -39645,7 +39644,7 @@ var render = function() {
             _c("div", { staticClass: "row" }, [
               _c("div", { staticClass: "col-md-8 col-lg-8" }, [
                 _c("label", { staticClass: "control-label h6" }, [
-                  _vm._v("New Question:")
+                  _vm._v("New Answer:")
                 ]),
                 _vm._v(" "),
                 _c("input", {
@@ -39742,7 +39741,9 @@ var render = function() {
                     _c(
                       "div",
                       [
-                        _c("vue-mathjax", { attrs: { formula: answer.answer } })
+                        _c("vue-mathjax", {
+                          attrs: { formula: "$$ " + answer.answer + " $$" }
+                        })
                       ],
                       1
                     ),
@@ -52185,7 +52186,7 @@ var _default = function _default() {
 
   this.Formula = {
     formula_incomplete: "The question formula is not complete",
-    answer_missing: 'The answer to the questions has been provided',
+    answer_missing: 'The answer to the questions has not been provided',
     multiple_answers_required: 'The question type requires mutliple choices'
   };
 };
@@ -52623,21 +52624,42 @@ module.exports = Quiz;
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return _default; });
 /* harmony import */ var _Answers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Answers */ "./resources/js/quizes/Answers.js");
+/* harmony import */ var _Quiz__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Quiz */ "./resources/js/quizes/Quiz.js");
+/* harmony import */ var _Quiz__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_Quiz__WEBPACK_IMPORTED_MODULE_1__);
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 
-var _default = /*#__PURE__*/function () {
+
+
+var _default = /*#__PURE__*/function (_Quiz) {
+  _inherits(_default, _Quiz);
+
+  var _super = _createSuper(_default);
+
   function _default() {
     _classCallCheck(this, _default);
 
-    this.question_text = '';
-    this.answers = [];
-    this.existing_keys = [];
+    return _super.call(this);
   }
 
   _createClass(_default, [{
@@ -52662,7 +52684,7 @@ var _default = /*#__PURE__*/function () {
   }]);
 
   return _default;
-}();
+}(_Quiz__WEBPACK_IMPORTED_MODULE_1___default.a);
 
 
 
@@ -52842,11 +52864,9 @@ var _default = /*#__PURE__*/function (_Quiz) {
   var _super = _createSuper(_default);
 
   function _default() {
-    var _this;
-
     _classCallCheck(this, _default);
 
-    return _possibleConstructorReturn(_this);
+    return _super.call(this);
   }
 
   _createClass(_default, [{

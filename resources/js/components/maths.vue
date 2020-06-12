@@ -3,7 +3,7 @@
 
 
         <error-component v-for="(error, ekey) in errors" v-bind="{error_text:error }" :key="ekey"></error-component>
-        <div v-if="type == 1">
+        <div >
             <formula-icons v-bind="{ Signs:Signs, element: getEditorElement(false)}"></formula-icons>
             <div class="form-group mb-3">
                 <label class="control-label h6">New Question:</label>
@@ -26,11 +26,11 @@
         <div v-if="type == 2 || type == 3">
 
             <div class="">
-                <formula-icons v-bind="{Signs:Signs, answer:true, element: getEditorElement()}"></formula-icons>
+                <formula-icons v-bind="{Signs:Signs, answer:false, element: getEditorElement(true)}"></formula-icons>
             </div>
             <div class="row">
                 <div class="col-md-8 col-lg-8">
-                    <label class="control-label h6">New Question:</label>
+                    <label class="control-label h6">New Answer:</label>
                     <input placeholder="Answer" ref="formula_answer" v-model="formula_answer" type="text" name="answer"
                         class="form-control" />
                 </div>
@@ -50,7 +50,7 @@
                         <i class="fa fa-times-circle " style="color:red" v-else></i>
                     </span>
                     <div>
-                        <vue-mathjax :formula="answer.answer"></vue-mathjax>
+                        <vue-mathjax :formula="'$$ '+answer.answer+' $$'"></vue-mathjax>
                     </div>
                     <div class="ml-auto" v-if="type == 2">
                         <input :checked="answer.is_correct" type="radio" name="question[correct_answer_id]"
@@ -116,10 +116,11 @@
             },
             RecordAnswer() {
                 this.errors = [];
-                if (this.QuizQuestion.QuestionIsValid(this.ForumalErrors)) {
+                if (this.QuizQuestion.question_text != null && this.QuizQuestion.question_text.length >= 3 ) {
+                    this.QuizQuestion.NewAnswer(this.formula_answer);
                     this.formula_answer = '';
                 } else
-                    this.errors.push(this.QuizQuestion.GetErrorMessage());
+                    this.errors.push(this.ForumalErrors.formula_incomplete);
 
                 // if(this.QuizQuestion.question_text == null || this.QuizQuestion.question_text.length <= 0){
                 //     this.errors.push(this.ForumalErrors.formula_incomplete);

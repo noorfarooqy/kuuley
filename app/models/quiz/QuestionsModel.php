@@ -23,11 +23,7 @@ class QuestionsModel extends Model
     public function NewTrueOrFalseQuestion($data, $quiz_id)
     {
         try {
-            $question =  $this->create([
-                "quiz_id" => $quiz_id,
-                "question_text" => $data["question_text"],
-                "question_type" => $this->trueOrFalseType,
-            ]);
+            $question =  $this->AddQuestion($data, $quiz_id, $this->trueOrFalseType);
             $AnswerModel = new AnswersModel();
             $Answer = $AnswerModel->AddAnswer($data["answers"], $question);
             if(!$Answer){
@@ -40,6 +36,32 @@ class QuestionsModel extends Model
             //throw $th;
             $this->error = $e->getMessage();
         }
+    }
+    public function NewChoiceQuestion($data, $quiz_id)
+    {
+        try {
+            $question =  $this->AddQuestion($data,$quiz_id, $this->singChoiceQuestion);
+            $AnswerModel = new AnswersModel();
+            $Answer = $AnswerModel->AddAnswer($data["answers"], $question);
+            if(!$Answer){
+                $question->delete();
+                $this->error = $AnswerModel->getError();
+                return false;
+            }
+            return $question;
+        } catch (Exception $e) {
+            //throw $th;
+            $this->error = $e->getMessage();
+        }
+    }
+
+    public function AddQuestion($data, $quiz, $type)
+    {
+        return $this->create([
+            "quiz_id" => $quiz,
+            "question_text" => $data["question_text"],
+            "question_type" => $type,
+        ]);
     }
 
     public function Answers()

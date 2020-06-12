@@ -3,6 +3,7 @@ import Answer from './Answers';
 import Quiz from './Quiz';
 export default class extends Quiz {
     constructor(){
+        super();
         
     }
     UpdateAnswers(answer){

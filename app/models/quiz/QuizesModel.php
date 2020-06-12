@@ -47,6 +47,15 @@ class QuizesModel extends Model
             }
             return $newQuestion;
         }
+        else if($data["question_type"] == $QuestionModel->singChoiceQuestion || 
+        $data["question_type"] == $QuestionModel->multiChoiceQuestion){
+            $newQuestion = $QuestionModel->NewChoiceQuestion($data, $this->id);
+            if(!$newQuestion){
+                $this->error = $QuestionModel->getError();
+                return true;
+            }
+            return $newQuestion;
+        }
         else {
             $this->error = "Unsupporeted question type";
             return false;

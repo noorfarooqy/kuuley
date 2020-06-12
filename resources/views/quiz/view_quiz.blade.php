@@ -84,7 +84,7 @@
                                         <form action="#">
 
 
-                                            {{-- <math-comp v-bind="{type:2}"></math-comp> --}}
+                                            <math-comp v-bind="{type:2}"></math-comp>
 
                                             {{-- <button class="btn btn-primary mt-3"><i class="material-icons">add</i>
                                                 Create Question</button> --}}
@@ -101,7 +101,7 @@
                                     <div class="card-body card-form__body">
                                         <form action="#">
 
-                                            {{-- <math-comp v-bind="{type:3}"></math-comp> --}}
+                                            <math-comp v-bind="{type:3}"></math-comp>
 
                                             {{-- <button class="btn btn-primary mt-3"><i class="material-icons">add</i>
                                                 Create Question</button> --}}
@@ -158,7 +158,7 @@
                                         </div>
                                         <div class="ml-auto">
                                             <i class="fa fa-check-circle" style="color: green"
-                                                v-if="!question.answers[0].answer_bool"></i>
+                                                v-if="question.answers[0].answer_bool == false"></i>
                                             <i class="fa fa-times-circle" style="color: red" v-else></i>
                                         </div>
                                     </li>
@@ -170,7 +170,24 @@
                                         </div>
                                         <div class="ml-auto">
                                             <i class="fa fa-check-circle" style="color: green"
-                                                v-if="question.answers[0].answer_bool"></i>
+                                                v-if="question.answers[0].answer_bool == true"></i>
+                                            <i class="fa fa-times-circle" style="color: red" v-else></i>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div id="answerWrapper_1" class="mb-4" v-else>
+
+                                <ul class="list-group" id="answer_container_1">
+                                    <li class="list-group-item d-flex" data-position="1" data-answer-id="1"
+                                        data-question-id="1" v-for="(answer, akey) in question.answers" :key="akey">
+                                        <span class="mr-2"><i class="material-icons text-light-gray">menu</i></span>
+                                        <div >
+                                            <vue-mathjax :formula="'$$ '+answer.answer_text+' $$'"></vue-mathjax>
+                                        </div>
+                                        <div class="ml-auto">
+                                            <i class="fa fa-check-circle" style="color: green"
+                                                v-if="answer.is_correct"></i>
                                             <i class="fa fa-times-circle" style="color: red" v-else></i>
                                         </div>
                                     </li>
