@@ -4,9 +4,9 @@ namespace App;
 
 use App\models\admin\AdminsModel;
 use App\models\instructors\InstructorModel;
-use Illuminate\Bus\Queueable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
 {
@@ -40,9 +40,9 @@ class User extends Authenticatable
     ];
 
     public function isAdmin()
-    { 
+    {
         $has_admins = AdminsModel::get()->count() > 0;
-        if(!$has_admins)
+        if (!$has_admins) {
             $this->RegisterAsAdmin([
                 "student_permission" => 60,
                 "instructor_permission" => 60,
@@ -52,7 +52,10 @@ class User extends Authenticatable
                 "kb_permission" => 60, //knowledge base
                 "settings_permission" => 60,
                 "forum_permission" => 60,
+                "quiz_permission" => 60,
             ]);
+        }
+
         return $this->hasOne(AdminsModel::class, 'user_id', 'id');
     }
     public function RegisterAsAdmin($permissions)
@@ -60,16 +63,16 @@ class User extends Authenticatable
         return AdminsModel::create([
             "user_id" => $this->id,
             "student_permission" => $permissions['student_permission'],
-            "instructor_permission"  => $permissions['instructor_permission'],
-            "course_permission"  => $permissions['course_permission'],
-            "admin_permission"  => $permissions['admin_permission'],
-            "blog_permission"  => $permissions['blog_permission'],
-            "kb_permission"  => $permissions['kb_permission'], //knowledge base
-            "settings_permission"  => $permissions['settings_permission'],
-            "forum_permission"  => $permissions['forum_permission'],
+            "instructor_permission" => $permissions['instructor_permission'],
+            "course_permission" => $permissions['course_permission'],
+            "admin_permission" => $permissions['admin_permission'],
+            "blog_permission" => $permissions['blog_permission'],
+            "kb_permission" => $permissions['kb_permission'], //knowledge base
+            "settings_permission" => $permissions['settings_permission'],
+            "forum_permission" => $permissions['forum_permission'],
+            "quiz_permission" => $permissions['quiz_permission'],
         ]);
     }
-
 
     public function InstructorInfo()
     {

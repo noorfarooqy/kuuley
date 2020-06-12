@@ -1,21 +1,14 @@
 
 import Answer from './Answers';
-import Quiz from './Quiz';
-export default class extends Quiz {
+export default class {
     constructor(){
-        
+        this.question_text = '';
+        this.answers = [];
+        this.existing_keys = [];
     }
     UpdateAnswers(answer){
-        console.log('new correct answer ',answer);
-        if(answer.is_correct)
-            return;
-        for(var i=0; i<this.answers.length; i++)
-        {
-            if(this.answers[i].answer_key === answer.answer_key)
-                this.answers[i].is_correct = true;
-            else
-                this.answers[i].is_correct =false;
-        }
+        var index = this.answers.indexOf(answer);
+        this.answers[index].is_correct = !this.answers[index].is_correct;
     }
     NewAnswer(answer_text){
         var newAnswer = new Answer(answer_text,false,this.existing_keys);

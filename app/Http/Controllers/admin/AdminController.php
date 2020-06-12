@@ -122,6 +122,7 @@ class AdminController extends Controller
                 "kb_permission" => 0, //knowledge base
                 "settings_permission" => 0,
                 "forum_permission" => 0,
+                "quiz_permission" => 0,
             ]);
             $new_user->notify(new NewAdminNotification($new_user, $resetToken));
         }
@@ -164,6 +165,7 @@ class AdminController extends Controller
                 "kb_permission" => 0, //knowledge base
                 "settings_permission" => 0,
                 "forum_permission" => 0,
+                "quiz_permission" => 0,
             ]);
 
             return Redirect::back()->with('successmessage', 'Successfully added ' . $user[0]->name . ' to admin group');

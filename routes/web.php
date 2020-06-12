@@ -47,8 +47,8 @@ Route::middleware(['auth'])->group(function () {
             });
             Route::prefix('/quiz')->group(function () {
                 Route::get('/', 'quiz\QuizController@ViewQuizIndexPage');
-                Route::post('/new', 'courses\CourseController@NewCourseCategory');
-                Route::get('/{student_id}', 'admin\AdminController@ViewStudentInfo');
+                Route::post('/', 'quiz\QuizController@CreateQuiz');
+                Route::get('/{quiz_id}', 'quiz\QuizController@ViewGivenQuiz');
             });
             Route::prefix('/courses')->group(function () {
                 Route::get('/', 'admin\AdminController@ViewCoursesPage');

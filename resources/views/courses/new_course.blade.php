@@ -51,7 +51,7 @@
                                 <select id="courseCategory" class="custom-select w-auto" name="courseCategory">
                                     <option value="-1">Choose category</option>
                                     @foreach ($categories as $category)
-                                    @if (old('category') == $category->id)
+                                    @if (old('courseCategory') == $category->id)
                                     <option selected value="{{$category->id}}">{{$category->category_name}}</option>
                                     @else
                                     <option value="{{$category->id}}">{{$category->category_name}}</option>
@@ -185,8 +185,8 @@
     {{-- <script src="/assets/vendor/dropzone.min.js"></script>
     <script src="/assets/js/dropzone.js"></script> --}}
 
-    <script type="text/javascript" src="//www.shieldui.com/shared/components/latest/js/jquery-1.11.1.min.js"></script>
-    <script type="text/javascript" src="//www.shieldui.com/shared/components/latest/js/shieldui-all.min.js"></script>
+    {{-- <script type="text/javascript" src="//www.shieldui.com/shared/components/latest/js/jquery-1.11.1.min.js"></script> --}}
+    {{-- <script type="text/javascript" src="//www.shieldui.com/shared/components/latest/js/shieldui-all.min.js"></script> --}}
 
     <script type="text/javascript">
         function PreviewFile(event)
@@ -222,38 +222,38 @@
                 return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
             }
         }
-        jQuery(function ($) {
-            $("#files").shieldUpload({
-                async: {
-                    enabled: true,
-                    save: {
-                        url: "/upload/save"
-                    },
-                    remove: {
-                        url: "/upload/remove"
-                    },
-                    data: {'_token': "{{csrf_token()}}"}
-                },
-                files: {
-                    template: function (fileInfo) {
-                        var content = $('<span/>');
-                        content.append(
-                            '<div>' + fileInfo.name + " " + formatSize(fileInfo.size) + '</div>'
-                        );
-                        // if image and the FileReader API is supported, show a thumbnail of the file
-                        if (/^image\//.test(fileInfo.type) && window.FileReader) {
-                            var img = $('<img width="100px" height="75px" style="display:block;" />').appendTo(content);
-                            var reader = new FileReader();
-                            reader.onload = (function (aImg) {
-                                return function (e) { aImg.src = e.target.result; };
-                            })(img.get(0));
-                            reader.readAsDataURL(fileInfo);
-                        }
-                        return content;
-                    }
-                }
-            });
-        });
+        // jQuery(function ($) {
+        //     $("#files").shieldUpload({
+        //         async: {
+        //             enabled: true,
+        //             save: {
+        //                 url: "/upload/save"
+        //             },
+        //             remove: {
+        //                 url: "/upload/remove"
+        //             },
+        //             data: {'_token': "{{csrf_token()}}"}
+        //         },
+        //         files: {
+        //             template: function (fileInfo) {
+        //                 var content = $('<span/>');
+        //                 content.append(
+        //                     '<div>' + fileInfo.name + " " + formatSize(fileInfo.size) + '</div>'
+        //                 );
+        //                 // if image and the FileReader API is supported, show a thumbnail of the file
+        //                 if (/^image\//.test(fileInfo.type) && window.FileReader) {
+        //                     var img = $('<img width="100px" height="75px" style="display:block;" />').appendTo(content);
+        //                     var reader = new FileReader();
+        //                     reader.onload = (function (aImg) {
+        //                         return function (e) { aImg.src = e.target.result; };
+        //                     })(img.get(0));
+        //                     reader.readAsDataURL(fileInfo);
+        //                 }
+        //                 return content;
+        //             }
+        //         }
+        //     });
+        // });
     </script>
 @endsection
 

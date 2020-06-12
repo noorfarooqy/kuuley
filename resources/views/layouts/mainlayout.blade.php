@@ -9,7 +9,7 @@
 
     <!-- Prevent the demo from appearing in search engines -->
     <meta name="robots" content="noindex">
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- Perfect Scrollbar -->
     <link type="text/css" href="/assets/vendor/perfect-scrollbar.css" rel="stylesheet">
 
@@ -29,6 +29,8 @@
     <link type="text/css" href="/assets/css/vendor-ion-rangeslider.css" rel="stylesheet">
     <link type="text/css" href="/assets/css/vendor-ion-rangeslider.rtl.css" rel="stylesheet">
 
+    <!-- Toastr -->
+    <link type="text/css" href="/assets/vendor/toastr.min.css" rel="stylesheet">
     @yield('links')
 
 
@@ -388,12 +390,12 @@
 
                                 {{-- @include('layouts.adminbar') --}}
                                 @auth
-                                @if (Auth::user()->is_student)
+                                @if (Auth::user()->isAdmin)
+                                @include('layouts.adminbar')
+                                
+                                @elseif(Auth::user()->is_student )
                                     
                                 @include('layouts.studentbar')
-                                @elseif(Auth::user()->isAdmin)
-                                    
-                                    @include('layouts.adminbar')
                                 @else
 
                                 @include('layouts.instructorbar')
@@ -591,7 +593,7 @@
       'mini': 'mini-/'
     }"></app-settings>
     </div>
-
+    @yield('toaster')
     <!-- jQuery -->
     <script src="/assets/vendor/jquery.min.js"></script>
 
@@ -619,9 +621,18 @@
     <script src="/assets/js/sidebar-mini.js"></script>
     <script src="/assets/js/app.js"></script>
 
+    <!-- Toastr -->
+    <script src="/assets/vendor/toastr.min.js"></script>
+    <script src="/assets/js/toastr.js"></script>
     <!-- App Settings (safe to remove) -->
     <script src="/assets/js/app-settings.js"></script>
-
+    @if (Auth::user())
+    <script>
+        window._token = "{{csrf_token()}}";
+        window.api_token = "{{Auth::user()->api_token}}";
+    </script>
+    @endif
+    
     @yield('scripts')
 
 

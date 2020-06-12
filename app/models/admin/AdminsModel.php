@@ -18,6 +18,7 @@ class AdminsModel extends Model
         "kb_permission", //knowledge base
         "settings_permission",
         "forum_permission",
+        "quiz_permission",
     ];
 
     public $perm_none = 0; //no permission

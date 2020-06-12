@@ -12,8 +12,17 @@ use Illuminate\Support\Facades\Route;
 | routes are loaded by the RouteServiceProvider within a group which
 | is assigned the "api" middleware group. Enjoy building your API!
 |
-*/
+ */
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
+});
+Route::middleware('auth:api')->group(function () {
+    Route::prefix('/admin')->group(function () {
+        Route::post('/courses/list/instructor', 'courses\CourseController@GetInstructorCourseList');
+        Route::post('/quiz/new', 'quiz\QuizController@NewQuestion');
+        Route::post('/quiz/questions', 'quiz\QuizController@GetQuizQuestions');
+        Route::post('/quiz/questions/delete', 'quiz\QuizController@DeteleQuestion');
+    });
+
 });
