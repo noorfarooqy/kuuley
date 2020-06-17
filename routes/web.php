@@ -35,7 +35,6 @@ Route::middleware(['auth'])->group(function () {
                     Route::post('/update/address/{inst_id}', 'instructor\InstructorController@UpdateAddressInfo');
                     Route::post('/update/social/{inst_id}', 'instructor\InstructorController@UpdateSocialInfo');
                 });
-
             });
             Route::prefix('/student')->group(function () {
                 Route::get('/list', 'admin\AdminController@ViewStudentsList');
@@ -58,11 +57,12 @@ Route::middleware(['auth'])->group(function () {
                 Route::get('/list/inactive', 'courses\CourseController@ViewInactiveCourses');
                 Route::get('/{course_id}', 'courses\CourseController@ViewCoursesGiven');
                 Route::post('/{course_id}/update', 'courses\CourseController@UpdateCoursesGiven');
+                Route::get('/{course_id}/lessons', 'courses\LessonsController@OpenLessonsPage');
+                Route::post('/{course_id}/lessons', 'courses\LessonsController@AddNewLession');
+                Route::post('/{course_id}/lessons/section', 'courses\LessonsController@AddNewSection');
             });
             Route::get('/instructors', 'admin\AdminController@OpenInstructorsList');
-            
         });
     });
-    
 });
 Route::get('/home', 'HomeController@index')->name('home');

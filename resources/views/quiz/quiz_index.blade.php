@@ -60,3 +60,14 @@
 
 {{-- <link id="themecss" rel="stylesheet" type="text/css" href="//www.shieldui.com/shared/components/latest/css/light/all.min.css" /> --}}
 @endsection
+
+
+@section('scripts')
+<script>
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_HTML"></script>
+
+<script src="/js/quizes.js"></script>
+{{-- <link id="themecss" rel="stylesheet" type="text/css" href="//www.shieldui.com/shared/compon            <div class="card-header">ents/latest/css/light/all.min.css" /> --}}
+@endsection

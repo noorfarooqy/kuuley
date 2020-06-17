@@ -103,17 +103,21 @@ class QuizController extends Controller
                 return Response()->json(["success_message" => false, "data" => [], "error_message" => "Permission denied"]);
             abort(403);
         }
+        // return [(int)$request->question_type ==  1, 'what'];
         $rules =[
             "question_type" => "required|integer|in:1,2,3",
             "question_text" => "required|string|max:1200|min:3",
-            "answers" => "required|". $request->question_type ==  1 ? "boolean" : 'array',
             "quiz_id" => "required|integer|exists:quizes,id",
         ];
         if($request->question_type >= 2){
+            $rules["answers"] = "required|array";
             $rules["answers.*.answer"] = "required|string";
             $rules["answers.*.is_correct"] = "required|boolean";
             
         }
+        else
+            $rules["answers"] = "required|boolean";
+
         $validated = Validator::make($request->all(),$rules);
         if($validated->fails()){
             return Response()->json(["success_message" => false, "data" => [], "error_message" => $validated->errors()->first()]);
@@ -125,19 +129,21 @@ class QuizController extends Controller
         $QuizModel = $QuizModel[0];
         // return $validated->validated()["question_t"];
         $data = $validated->validated();
-        $has_correct = false;
-        foreach ($data["answers"] as $key => $answer) {
-            # code...
-            if($answer["is_correct"])
-                $has_correct = true;
+        if($request->question_type >= 2){
+            $has_correct = false;
+            foreach ($data["answers"] as $key => $answer) {
+                # code...
+                if($answer["is_correct"])
+                    $has_correct = true;
+            }
+            if(!$has_correct)
+                return Response()->json([
+                    "success_message" => false, 
+                    "data" => [], 
+                    "error_message" => "Please provide at least one correct answer",
+                    "error_description" => '',
+                ]);
         }
-        if(!$has_correct)
-            return Response()->json([
-                "success_message" => false, 
-                "data" => [], 
-                "error_message" => "Please provide at least one correct answer",
-                "error_description" => '',
-            ]);
         $NewQuestion = $QuizModel->AddNewQuestion($data);
         if(!$NewQuestion){
             return Response()->json([

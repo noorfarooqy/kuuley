@@ -53073,7 +53073,7 @@ var _default = /*#__PURE__*/function () {
         };
 
         reader.readAsDataURL(input.files[0]);
-      }
+      } else errorCallback('could not read input ', input);
     }
   }, {
     key: "getError",
@@ -53101,7 +53101,7 @@ var _default = /*#__PURE__*/function () {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! /home/noorfarooqy/Documents/Noor/sites/soscentre/kuuley/resources/js/quizes/quizes.js */"./resources/js/quizes/quizes.js");
+module.exports = __webpack_require__(/*! /Users/noorfarooqy/Sites/kuuley/resources/js/quizes/quizes.js */"./resources/js/quizes/quizes.js");
 
 
 /***/ })
