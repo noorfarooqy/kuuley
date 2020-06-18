@@ -18,7 +18,7 @@
 
                 @if ($errors->any())
                 <div class="alert alert-danger">
-                    {{$errors->first()}}
+                    <i  class="fa fa-1x fa-info-circle"></i> {{$errors->first()}}
                 </div>
                 @elseif(Session::has('success'))
                 <div class="alert alert-success">
@@ -29,7 +29,7 @@
                     <i class="fa fa-info-circle fa-1x"></i><span v-text="error"></span>
                 </div>
 
-                <form action="" method="post">
+                <form action="" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="card">
                         <div class="card-form__body card-body">
@@ -43,12 +43,12 @@
                                 <div class="col-md-6 col-lg-6">
                                     <label for="category">Lesson Section:</label><br>
 
-                                    <select class="form-control" name="section" id="">
+                                    <select class="form-control" id="" name="lessonSection">
                                         <option value="-1">Select section</option>
                                         @foreach ($sections as $section)
-                                        @if (old('section'))
+                                        @if (old('lessonSection') == $section->id)
                                         <option selected value="{{$section->id}}">{{$section->section_name}}</option>
-                                        @else
+                                        @else 
                                         <option value="{{$section->id}}">{{$section->section_name}}</option>
                                         @endif
 
@@ -57,23 +57,46 @@
 
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label for="fname">Title</label>
-                                <input name="lessonTittle" type="text" class="form-control" placeholder="Title goes here"
-                                    value="Course title is editable here">
+                            <div class="row">
+                                <div class="col-md-8 col-lg-8">
+                                    <div class="form-group">
+                                        <label for="fname">Title</label>
+                                        <input name="lessonTitle" type="text" class="form-control" placeholder="Title goes here"
+                                            value="{{old('lessonTitle')}}">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-lg-4">
+                                    <div class="form-group">
+                                        <label for="lessonTpype">Lesson type</label>
+                                        <select name="lessonType" id="" class="form-control">
+                                            <option value="-1">Select lesson type</option>
+                                            @if (old('lessonType') == 1)
+                                                <option selected value="2">Normal lesson</option>
+                                                <option  value="1">Assignment</option>
+                                            @elseif (old('lessonType') == 2)
+                                                <option value="2">Normal lesson</option>
+                                                <option selected value="1">Assignment</option>
+                                            @else
+                                                <option value="2">Normal lesson</option>
+                                                <option value="1">Assignment</option>
+                                            @endif
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
+                            
 
                             <div class="form-group">
                                 <label for="desc">Description</label>
                                 <textarea name="lessonDescription" rows="4" class="form-control"
-                                    placeholder="Please enter a description"></textarea>
+                                    placeholder="Please enter a description">{{old('lessonDescription')}}</textarea>
                             </div>
 
                             <div class="form-group mb-0">
                                 <label for="subscribe">Published</label><br>
                                 <div class="custom-control custom-checkbox-toggle custom-control-inline mr-1">
-                                    <input checked="" type="checkbox" id="subscribe" class="custom-control-input">
-                                    <label name="lessonIsPublished" class="custom-control-label" for="subscribe">Yes</label>
+                                    <input name="lessonIsPublished" checked="" type="checkbox" id="subscribe" class="custom-control-input">
+                                    <label  class="custom-control-label" for="subscribe">Yes</label>
                                 </div>
                                 <label for="subscribe" class="mb-0">Yes</label>
                             </div>

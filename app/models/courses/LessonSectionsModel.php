@@ -34,6 +34,13 @@ class LessonSectionsModel extends Model
         }
     }
 
+    public function NewLesson($data, $uploaded_file, $mimetype, $assignment)
+    {
+        $lessonModel = new LessonsModel();
+        $new_lesson = $lessonModel->NewLesson($data, $uploaded_file, $mimetype, $assignment, $this->course_id, $this->id);
+        $this->error_message = $lessonModel->getError();
+        return $new_lesson;
+    }
     public function getError()
     {
         return $this->error_message;

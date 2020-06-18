@@ -15,9 +15,9 @@ class CreateLessonsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('course_id');
             $table->unsignedBigInteger('section_id');
-            $table->unsignedSmallInteger('lesson_type'); //can be video or document
+            $table->unsignedSmallInteger('lesson_type'); //can be video or document /assignment
             $table->unsignedBigInteger('assignment_id')->nullable();
-            $table->string('lesson_url');
+            $table->string('lesson_url')->nullable();
             $table->boolean('is_active')->default(true);
             $table->boolean('is_deleted')->default(false);
             $table->unsignedBigInteger('created_by');
