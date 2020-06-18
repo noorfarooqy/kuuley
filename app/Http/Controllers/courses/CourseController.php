@@ -29,7 +29,6 @@ class CourseController extends Controller
         $new_cat = $CategoryModel->AddCategory($data, $admin->user_id);
 
         return Redirect::back()->with('success', 'Successfully created new category');
-
     }
 
     public function AddNewCoursePage(Request $request)
@@ -83,7 +82,6 @@ class CourseController extends Controller
             }
 
             $data["coursePreview"] = Storage::disk('public')->url($coursePreview);
-
         }
 
         $new_course = $course->UpdateCourseInfo($data, $admin->user_id);
@@ -148,23 +146,27 @@ class CourseController extends Controller
     public function GetInstructorCourseList(Request $request)
     {
         $admin = $request->user()->isAdmin;
-        if($admin->course_permission < $admin->perm_read){
+        if ($admin->course_permission < $admin->perm_read) {
             return Response()->json(["success_message" => false, "data" => [], "error_message" => "Permission denied"]);
         }
 
-        $courses = CoursesModel::where("course_created_by",$admin->user_id)->get(["id","course_name"]);
-        
+        $courses = CoursesModel::where("course_created_by", $admin->user_id)->get(["id", "course_name"]);
+
         return Response()->json(["success_message" => true, 'data' => [$courses]]);
     }
 
-    public function AddNewQuiz(Request $request)
+    public function ViewCourseLessons(Request $request, $course_id)
     {
         $admin = $request->user()->isAdmin;
-        if($admin->quiz_permission < $admin->perm_write){
-            return Response()->json(["success_message" => false, "data" => [], "error_message" => "Permission denied"]);
-        }
+        abort_if($admin->quiz_permission < $admin->perm_write, 403);
 
-        
+        $course = CoursesModel::where('id', $course_id)->get();
+        abort_if($course == null || $course->count() <= 0, 404);
 
+        $course = $course[0];
+
+        $sections = $course->lessonSections;
+
+        return view('lessons.view_lessons', compact('course', 'sections'));
     }
 }

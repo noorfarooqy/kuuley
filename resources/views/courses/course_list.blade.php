@@ -76,7 +76,8 @@
                                             <i class="material-icons">more_vert</i>
                                         </a>
                                         <div class="dropdown-menu dropdown-menu-right">
-                                            <a class="dropdown-item" href="/admin/courses/{{$course->id}}/lessons">Course Lessons</a>
+                                            <a class="dropdown-item" href="/admin/courses/{{$course->id}}/lessons">Add Lessons</a>
+                                            <a class="dropdown-item" href="/admin/courses/{{$course->id}}/lessons/list">View Lessons</a>
                                             <a class="dropdown-item" href="/admin/courses/{{$course->id}}">Edit Course</a>
                                             <a class="dropdown-item" href="#">Statistics</a>
                                             <div class="dropdown-divider"></div>

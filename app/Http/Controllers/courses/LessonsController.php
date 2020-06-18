@@ -22,12 +22,7 @@ class LessonsController extends Controller
     public function OpenLessonsPage(Request $request, $course_id)
     {
         $admin = $request->user()->isAdmin;
-        if ($admin->quiz_permission < $admin->perm_write) {
-            if ($request->expectsJson()) {
-                return Response()->json(['success_message' => false, 'data' => [], 'error_message' => 'Permission denied']);
-            }
-            abort(403);
-        }
+        abort_if($admin->quiz_permission < $admin->perm_read, 403);
         $course = CoursesModel::where('id', $course_id)->get();
         abort_if($course == null || $course->count() <= 0, 403);
 
@@ -44,12 +39,7 @@ class LessonsController extends Controller
     public function AddNewSection(Request $request, $course_id)
     {
         $admin = $request->user()->isAdmin;
-        if ($admin->quiz_permission < $admin->perm_write) {
-            if ($request->expectsJson()) {
-                return Response()->json(['success_message' => false, 'data' => [], 'error_message' => 'Permission denied']);
-            }
-            abort(403);
-        }
+        abort_if($admin->quiz_permission < $admin->perm_write, 403);
 
         $course = CoursesModel::where('id', $course_id)->get();
         abort_if($course == null || $course->count() <= 0, 403);
@@ -77,56 +67,27 @@ class LessonsController extends Controller
         }
     }
 
-    public function AddNewLession(Request $request, $course_id)
+    public function AddNewLession(Request $request, $course_id, $update = false)
     {
         $admin = $request->user()->isAdmin;
-        if ($admin->quiz_permission < $admin->perm_write) {
-            if ($request->expectsJson()) {
-                return Response()->json(['success_message' => false, 'data' => [], 'error_message' => 'Permission denied']);
-            }
-            abort(403);
-        }
+        abort_if($admin->quiz_permission < $admin->perm_write, 403);
 
         $course = CoursesModel::where('id', $course_id)->get();
         abort_if($course == null || $course->count() <= 0, 403);
 
         $course = $course[0];
 
-        $data = $request->validate([
-            'lessonTitle' => 'required|string|max:255|min:3',
-            'lessonDescription' => 'required|string|max:1200|min:3',
-            'lessonIsPublished' => 'required|in:on,off',
-            'lessonResourceFile' => 'nullable|file|mimes:mp4,webm,pdf',
-            "lessonType" => "required|integer|in:1,2",
-            "assignmentId" => "nullable|exists:quizes,id",
-            "lessonSection" => "required|integer|exists:lesson_sections,id"
-        ]);
+        $data = $request->validate($this->GetNewLessonRules());
 
         if ($data["lessonType"] == 2) {
-            if ($request->file('lessonResourceFile') == null) {
-                return Redirect::back()->withErrors(['The lesson type requires a video or document resource']);
-            }
-            $path = "uploads/courses/$course->id" . "-$course->course_name/lessons";
-
-            try {
-                $uploaded_file = $request->file('lessonResourceFile')->store($path, 'public');
-                $mimetype = Storage::disk('public')->mimeType($uploaded_file);
-            } catch (Exception $e) {
-                return Redirect::back()->withErrors('lessonResourceFile', 'Failed to upload the file - ' . $e->getMessage());
-            }
+            $uploaded_file = $this->UploadLessonFile($request, $course);
+            if (!$uploaded_file)
+                return Redirect::back()->withErrors(['lessonResourceFile' => $this->error_message]);
+            $mimetype = Storage::disk('public')->mimeType($uploaded_file);
             $assignment = null;
         } else {
             //ensure the assigment belongs to the given course
-            $assignment = QuizesModel::where([
-                ['id', isset($data["assignmentId"]) ? $data["assignmentId"] : null],
-                ['course_id', $course_id]
-            ])->get();
-            if ($assignment == null || $assignment->count() <= 0) {
-                return Redirect::back()->withErrors(['assignmentId' => 'The given assignment id does not correspond 
-                to the given course']);
-            } else if ($assignment[0]->is_deleted) {
-                return Redirect::back()->withErrors(['assignmentId' => 'The assignment selected does not exist or is deleted']);
-            }
+            $assignment = $this->GetAssignmentInfo($course_id, $data);
             $assignment = $assignment[0]->id;
             $uploaded_file = null;
             $mimetype = null;
@@ -140,9 +101,15 @@ class LessonsController extends Controller
         }
         $section = $section[0];
         $data["creator"] = $admin->user_id;
-        $new_lesson = $section->NewLesson($data, $uploaded_file, $mimetype, $assignment);
-
-        if ($new_lesson) {
+        $lesson = $section->NewLesson($data, $uploaded_file, $mimetype, $assignment, $update);
+        if ($update) {
+            if (!$lesson) {
+                $this->error_message = $section->getError();
+                return false;
+            }
+            return $lesson;
+        }
+        if ($lesson) {
             return Redirect::back()->with('success', 'Successfully added new lesson to the course and section');
         }
         return Redirect::back()->withErrors(['lesson' => $section->getError()]);
@@ -157,5 +124,130 @@ class LessonsController extends Controller
             $this->error_message = $e->getMessage();
             return false;
         }
+    }
+
+    public function ViewLessonInfo(Request $request, $course_id, $lesson_id)
+    {
+        $admin = $request->user()->isAdmin;
+        abort_if($admin->quiz_permission < $admin->perm_read, 403);
+
+        $course = CoursesModel::where('id', $course_id)->get();
+        abort_if($course == null || $course->count() <= 0, 403);
+
+        $course = $course[0];
+
+        $sections = LessonSectionsModel::where([
+            ['course_id', $course_id],
+            ['is_active', true],
+        ])->get();
+
+        $lesson = LessonsModel::where("id", $lesson_id)->get();
+        abort_if($lesson == null || $lesson->count() <= 0, 404);
+        $lesson = $lesson[0];
+        return view('lessons.update_lesson', compact('course', 'sections', 'lesson'));
+    }
+
+    public function UpdateLesson(Request $request, $course_id, $lesson_id)
+    {
+
+        $updated = $this->AddNewLession($request, $course_id, true);
+        if (!$updated) {
+            return Redirect::back()->withErrors(['lessonType' => $this->error_message]);
+        }
+        return Redirect::back()->with('success', 'successfully updated the lesson');
+        // $admin = $request->user()->isAdmin;
+        // abort_if($admin->quiz_permission < $admin->perm_read, 403);
+
+        // $course = CoursesModel::where('id', $course_id)->get();
+        // abort_if($course == null || $course->count() <= 0, 403);
+
+        // $course = $course[0];
+
+        // $lesson = LessonsModel::where("id", $lesson_id)->get();
+        // abort_if($lesson == null || $lesson->count() <= 0, 404);
+
+        // $data = $request->validate($this->GetNewLessonRules());
+
+        // if ($data["lessonType"] == 2) {
+        //     $uploaded_file = $this->UploadLessonFile($request, $course);
+        //     if (!$uploaded_file)
+        //         return Redirect::back()->withErrors(['lessonResourceFile' => $this->error_message]);
+
+        //     $mimetype = Storage::disk('public')->mimeType($uploaded_file);
+        //     $assignment = null;
+        // } else {
+        //     //ensure the assigment belongs to the given course
+        //     $assignment = $this->GetAssignmentInfo($course_id, $data);
+        //     if (!$assignment)
+        //         return Redirect::back()->withErrors(['assignmentId' => $this->error_message]);
+        //     $assignment = $assignment[0]->id;
+        //     $uploaded_file = null;
+        //     $mimetype = null;
+        // }
+        // $sections = LessonSectionsModel::where([
+        //     ['id', $data["lessonSection"]],
+        //     ["course_id", $course_id],
+        //     ['is_active', true],
+        // ])->get();
+        // if ($sections == null || $sections->count() <= 0) {
+        //     return Redirect::back()->withErrors(['lessonSection' => 'The lesson section doesnt correspond with the given course']);
+        // }
+        // $section = $sections[0];
+        // $data["creator"] = $admin->user_id;
+        // $updated_lesson = $section->UpdateLesson($data, $uploaded_file, $mimetype, $assignment);
+
+        // if ($updated_lesson) {
+        //     return Redirect::back()->with('success', 'Successfully added new lesson to the course and section');
+        // }
+        // return Redirect::back()->withErrors(['lesson' => $section->getError()]);
+    }
+
+
+    protected function GetNewLessonRules()
+    {
+        return [
+            'lessonTitle' => 'required|string|max:255|min:3',
+            'lessonDescription' => 'required|string|max:1200|min:3',
+            'lessonIsPublished' => 'nullable|in:on',
+            'lessonResourceFile' => 'nullable|file|mimes:mp4,webm,pdf',
+            "lessonType" => "required|integer|in:1,2",
+            "assignmentId" => "nullable|exists:quizes,id",
+            "lessonSection" => "required|integer|exists:lesson_sections,id"
+        ];
+    }
+    protected function UploadlessonFile($request, $course)
+    {
+        if ($request->file('lessonResourceFile') == null) {
+            // return Redirect::back()->withErrors(['The lesson type requires a video or document resource']);
+            $this->error_message = 'The lesson type requires a video or document resource';
+            return false;
+        }
+        $path = "uploads/courses/$course->id" . "-$course->course_name/lessons";
+        // return $path;
+        try {
+            $uploaded_file = $request->file('lessonResourceFile')->store($path, 'public');
+            return $uploaded_file;
+        } catch (Exception $e) {
+            return Redirect::back()->withErrors('lessonResourceFile', 'Failed to upload the file - ' . $e->getMessage());
+        }
+    }
+
+    public function GetAssignmentInfo($course_id, $data)
+    {
+        $assignment = QuizesModel::where([
+            ['id', isset($data["assignmentId"]) ? $data["assignmentId"] : null],
+            ['course_id', $course_id]
+        ])->get();
+        if ($assignment == null || $assignment->count() <= 0) {
+            // return Redirect::back()->withErrors(['assignmentId' => 'The given assignment id does not correspond 
+            //     to the given course']);
+            $this->error_message = 'The given assignment id does not correspond to the given course';
+            return false;
+        } else if ($assignment[0]->is_deleted) {
+            $this->error_message = 'The assignment selected does not exist or is deleted';
+            return false;
+            // return Redirect::back()->withErrors(['assignmentId' => 'The assignment selected does not exist or is deleted']);
+        }
+        return $assignment;
     }
 }

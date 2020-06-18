@@ -34,12 +34,20 @@ class LessonSectionsModel extends Model
         }
     }
 
-    public function NewLesson($data, $uploaded_file, $mimetype, $assignment)
+    public function NewLesson($data, $uploaded_file, $mimetype, $assignment, $update = false)
     {
         $lessonModel = new LessonsModel();
-        $new_lesson = $lessonModel->NewLesson($data, $uploaded_file, $mimetype, $assignment, $this->course_id, $this->id);
+        if (!$update)
+            $lesson = $lessonModel->NewLesson($data, $uploaded_file, $mimetype, $assignment, $this->course_id, $this->id);
+        else
+            $lesson = $lessonModel->UpdateLesson($data, $uploaded_file, $mimetype, $assignment, $this->course_id, $this->id);
         $this->error_message = $lessonModel->getError();
-        return $new_lesson;
+        return $lesson;
+    }
+
+    public function lessons()
+    {
+        return $this->hasMany(LessonsModel::class, 'section_id', 'id');
     }
     public function getError()
     {

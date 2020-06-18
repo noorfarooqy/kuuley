@@ -49685,7 +49685,8 @@ var app = new Vue({
     },
     Errors: [],
     Questions: [],
-    Assignments: []
+    Assignments: [],
+    lessonType: null
   },
   mounted: function mounted() {},
   methods: {
@@ -49722,7 +49723,9 @@ var app = new Vue({
 
       if (index == 2) {
         this.getAssignments(course);
-      }
+      } else this.Assignments = [];
+
+      this.lessonType = index;
     }
   }
 });

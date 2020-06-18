@@ -58,6 +58,9 @@ Route::middleware(['auth'])->group(function () {
                 Route::get('/{course_id}', 'courses\CourseController@ViewCoursesGiven');
                 Route::post('/{course_id}/update', 'courses\CourseController@UpdateCoursesGiven');
                 Route::get('/{course_id}/lessons', 'courses\LessonsController@OpenLessonsPage');
+                Route::get('/{course_id}/lessons/list', 'courses\CourseController@ViewCourseLessons');
+                Route::get('/{course_id}/lessons/{lesson_id}', 'courses\LessonsController@ViewLessonInfo');
+                Route::post('/{course_id}/lessons/{lesson_id}/update', 'courses\LessonsController@UpdateLesson');
                 Route::post('/{course_id}/lessons', 'courses\LessonsController@AddNewLession');
                 Route::post('/{course_id}/lessons/section', 'courses\LessonsController@AddNewSection');
             });

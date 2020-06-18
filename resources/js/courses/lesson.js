@@ -14,6 +14,7 @@ var app = new Vue({
         Errors: [],
         Questions: [],
         Assignments: [],
+        lessonType: null,
     },
     mounted() {
 
@@ -51,7 +52,10 @@ var app = new Vue({
             var index = event.target.options.selectedIndex;
             if (index == 2) {
                 this.getAssignments(course)
-            }
+            } else
+                this.Assignments = [];
+            this.lessonType = index;
+
         }
     }
 })

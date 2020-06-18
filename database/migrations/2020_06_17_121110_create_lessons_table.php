@@ -15,6 +15,8 @@ class CreateLessonsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('course_id');
             $table->unsignedBigInteger('section_id');
+            $table->string('lessonTitle');
+            $table->string('lessonDescription', 1200);
             $table->unsignedSmallInteger('lesson_type'); //can be video or document /assignment
             $table->unsignedBigInteger('assignment_id')->nullable();
             $table->string('lesson_url')->nullable();

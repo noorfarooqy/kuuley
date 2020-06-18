@@ -42,9 +42,13 @@ class CoursesModel extends Model
         ]);
     }
 
+    public function lessonSections()
+    {
+        return $this->hasMany(LessonSectionsModel::class, 'course_id', 'id');
+    }
+
     public function Category()
     {
         return $this->belongsTo(CourseCategoryModel::class, "course_category", "id");
     }
-
 }
