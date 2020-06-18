@@ -98,7 +98,7 @@ class LessonsController extends Controller
             'lessonIsPublished' => 'required|in:on,off',
             'lessonResourceFile' => 'nullable|file|mimes:mp4,webm,pdf',
             "lessonType" => "required|integer|in:1,2",
-            "assignmentId" => "nullable|exists:lessons,assignment_id",
+            "assignmentId" => "nullable|exists:quizes,id",
             "lessonSection" => "required|integer|exists:lesson_sections,id"
         ]);
 
@@ -127,6 +127,7 @@ class LessonsController extends Controller
             } else if ($assignment[0]->is_deleted) {
                 return Redirect::back()->withErrors(['assignmentId' => 'The assignment selected does not exist or is deleted']);
             }
+            $assignment = $assignment[0]->id;
             $uploaded_file = null;
             $mimetype = null;
         }
@@ -144,7 +145,7 @@ class LessonsController extends Controller
         if ($new_lesson) {
             return Redirect::back()->with('success', 'Successfully added new lesson to the course and section');
         }
-        return Redirect::back()->withErrors(['lesson' => $lessonModel->getError()]);
+        return Redirect::back()->withErrors(['lesson' => $section->getError()]);
     }
 
     protected function UploadFile($file, $path)

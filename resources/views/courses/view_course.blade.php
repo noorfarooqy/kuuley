@@ -191,8 +191,8 @@
     {{-- <script src="/assets/vendor/dropzone.min.js"></script>
     <script src="/assets/js/dropzone.js"></script> --}}
 
-    <script type="text/javascript" src="//www.shieldui.com/shared/components/latest/js/jquery-1.11.1.min.js"></script>
-    <script type="text/javascript" src="//www.shieldui.com/shared/components/latest/js/shieldui-all.min.js"></script>
+    {{-- <script type="text/javascript" src="//www.shieldui.com/shared/components/latest/js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="//www.shieldui.com/shared/components/latest/js/shieldui-all.min.js"></script> --}}
 
     <script type="text/javascript">
         function PreviewFile(event)

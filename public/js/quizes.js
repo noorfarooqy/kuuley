@@ -52731,11 +52731,13 @@ var app = new Vue((_Vue = {
     }
   },
   mounted: function mounted() {
-    this.Server.setRequest({
-      api_token: window.api_token,
-      quiz_id: window.quiz_id
-    });
-    this.Server.serverRequest('/api/admin/quiz/questions', this.ShowQuizQuestions, this.ShowErrors);
+    if (window.quiz_id != undefined && window.quiz_id != null) {
+      this.Server.setRequest({
+        api_token: window.api_token,
+        quiz_id: window.quiz_id
+      });
+      this.Server.serverRequest('/api/admin/quiz/questions', this.ShowQuizQuestions, this.ShowErrors);
+    }
   }
 }, _defineProperty(_Vue, "methods", {
   ShowQuizQuestions: function ShowQuizQuestions(data) {

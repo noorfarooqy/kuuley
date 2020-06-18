@@ -48,7 +48,7 @@ class LessonsModel extends Model
             ]);
         } catch (Exception $e) {
             //throw $th;
-            $this->error_messsage = $e->getMessage();
+            $this->error_message = $e->getMessage();
             return false;
         }
     }

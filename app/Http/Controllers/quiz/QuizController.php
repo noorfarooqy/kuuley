@@ -21,12 +21,12 @@ class QuizController extends Controller
     public function CreateQuiz(Request $request)
     {
         $admin = $request->user()->isAdmin;
-        if($admin->quiz_permission < $admin->perm_write){
-            if($request->expectsJson())
+        if ($admin->quiz_permission < $admin->perm_write) {
+            if ($request->expectsJson())
                 return Response()->json(["success_message" => false, "data" => [], "error_message" => "Permission denied"]);
             abort(403);
         }
-        
+
         $rules = [
             "quiz_title" => "required|string|max:250|min:3",
             "quiz_instructions" => "required|string|max:1200",
@@ -39,116 +39,111 @@ class QuizController extends Controller
         $newQuiz = QuizesModel::create([
             "quiz_title" => $data["quiz_title"],
             "quiz_instructions" => $data["quiz_instructions"],
-            "has_course" => isset($data["quiz_course"]) ,
+            "has_course" => isset($data["quiz_course"]),
             "course_id" => $data["quiz_type"] == 2 ? $data["quiz_course"] : null,
             "is_diagnostic" => $data["quiz_type"] == 1,
             "created_by" => $admin->user_id,
         ]);
 
-        if($request->expectsJson()){
+        if ($request->expectsJson()) {
             return Response()->json([
-                "success_message" => false, 
-                "data" => $newQuiz, 
+                "success_message" => false,
+                "data" => $newQuiz,
                 "error_message" => "Successfully created new quiz"
             ]);
         }
-        return redirect()->to('/admin/quiz/'.$newQuiz->id);
-
+        return redirect()->to('/admin/quiz/' . $newQuiz->id);
     }
 
     public function ViewGivenQuiz(Request $request, $quiz_id)
     {
         $admin = $request->user()->isAdmin;
-        if($admin->quiz_permission < $admin->perm_write){
-            if($request->expectsJson())
+        if ($admin->quiz_permission < $admin->perm_write) {
+            if ($request->expectsJson())
                 return Response()->json(["success_message" => false, "data" => [], "error_message" => "Permission denied"]);
             abort(403);
         }
 
         $quiz = QuizesModel::where("id", $quiz_id)->get();
-        abort_if($quiz == null || $quiz->count() <=0, 404);
+        abort_if($quiz == null || $quiz->count() <= 0, 404);
         $quiz = $quiz[0];
         return view('quiz.view_quiz', compact('quiz'));
-            
     }
     public function GetQuizQuestions(Request $request)
     {
         $admin = $request->user()->isAdmin;
-        if($admin->quiz_permission < $admin->perm_read){
-            if($request->expectsJson())
+        if ($admin->quiz_permission < $admin->perm_read) {
+            if ($request->expectsJson())
                 return Response()->json(["success_message" => false, "data" => [], "error_message" => "Permission denied"]);
             abort(403);
         }
-        $validated = Validator::make($request->all(),[
+        $validated = Validator::make($request->all(), [
             "quiz_id" => "required|integer|exists:quizes,id",
         ]);
-        if($validated->fails()){
+        if ($validated->fails()) {
             return Response()->json(["success_message" => false, "data" => [], "error_message" => $validated->errors()->first()]);
         }
-        $quiz = QuizesModel::where("id", $request->quiz_id)->with('Questions','Questions.Answers')->get();
-        if($quiz == null || $quiz->count() <=0){
-            return Response()->json(["success_message" => false, "data" => [], "error_message" => "could not find the quiz"],404);
+        $quiz = QuizesModel::where("id", $request->quiz_id)->with('Questions', 'Questions.Answers')->get();
+        if ($quiz == null || $quiz->count() <= 0) {
+            return Response()->json(["success_message" => false, "data" => [], "error_message" => "could not find the quiz"], 404);
         }
         $questions = $quiz[0]->Questions;
-        
+
         return Response()->json(["success_message" => true, "data" => $questions]);
-            
     }
 
     public function NewQuestion(Request $request)
     {
         $admin = $request->user()->isAdmin;
-        if($admin->quiz_permission < $admin->perm_write){
-            if($request->expectsJson())
+        if ($admin->quiz_permission < $admin->perm_write) {
+            if ($request->expectsJson())
                 return Response()->json(["success_message" => false, "data" => [], "error_message" => "Permission denied"]);
             abort(403);
         }
         // return [(int)$request->question_type ==  1, 'what'];
-        $rules =[
+        $rules = [
             "question_type" => "required|integer|in:1,2,3",
             "question_text" => "required|string|max:1200|min:3",
             "quiz_id" => "required|integer|exists:quizes,id",
         ];
-        if($request->question_type >= 2){
+        if ($request->question_type >= 2) {
             $rules["answers"] = "required|array";
             $rules["answers.*.answer"] = "required|string";
             $rules["answers.*.is_correct"] = "required|boolean";
-            
-        }
-        else
+        } else
             $rules["answers"] = "required|boolean";
 
-        $validated = Validator::make($request->all(),$rules);
-        if($validated->fails()){
+        $validated = Validator::make($request->all(), $rules);
+        if ($validated->fails()) {
             return Response()->json(["success_message" => false, "data" => [], "error_message" => $validated->errors()->first()]);
         }
         $QuizModel = QuizesModel::where("id", $request->quiz_id)->get();
-        if($QuizModel == null || $QuizModel->count() <=0){
-            return Response()->json(["success_message" => false, "data" => [], "error_message" => "could not find the quiz"],404);
+        if ($QuizModel == null || $QuizModel->count() <= 0) {
+            return Response()->json(["success_message" => false, "data" => [], "error_message" => "could not find the quiz"], 404);
         }
         $QuizModel = $QuizModel[0];
         // return $validated->validated()["question_t"];
         $data = $validated->validated();
-        if($request->question_type >= 2){
+        if ($request->question_type >= 2) {
             $has_correct = false;
             foreach ($data["answers"] as $key => $answer) {
                 # code...
-                if($answer["is_correct"])
+                if ($answer["is_correct"])
                     $has_correct = true;
             }
-            if(!$has_correct)
+            if (!$has_correct)
                 return Response()->json([
-                    "success_message" => false, 
-                    "data" => [], 
+                    "success_message" => false,
+                    "data" => [],
                     "error_message" => "Please provide at least one correct answer",
                     "error_description" => '',
                 ]);
         }
         $NewQuestion = $QuizModel->AddNewQuestion($data);
-        if(!$NewQuestion){
+        if (!$NewQuestion) {
             return Response()->json([
-                "success_message" => false, 
-                "data" => [], 
+                "success_message" => false,
+                "data" => [],
                 "error_message" => "Failed to add the new question. Contact Adminstrator for assistance",
                 "error_description" => $QuizModel->getError(),
             ]);
@@ -160,35 +155,35 @@ class QuizController extends Controller
     public function DeteleQuestion(Request $request)
     {
         $admin = $request->user()->isAdmin;
-        if($admin->quiz_permission < $admin->perm_delete){
-            if($request->expectsJson())
+        if ($admin->quiz_permission < $admin->perm_delete) {
+            if ($request->expectsJson())
                 return Response()->json(["success_message" => false, "data" => [], "error_message" => "Permission denied"]);
             abort(403);
         }
-        $validated = Validator::make($request->all(),[
+        $validated = Validator::make($request->all(), [
             "question" => "required|integer|exists:questions,id",
             "quiz_id" => "required|integer|exists:quizes,id",
         ]);
-        if($validated->fails()){
+        if ($validated->fails()) {
             return Response()->json([
-                "success_message" => false, 
-                "data" => [], 
+                "success_message" => false,
+                "data" => [],
                 "error_message" => $validated->errors()->first(),
-                "error_description" =>"",
+                "error_description" => "",
             ]);
         }
-        $data= $validated->validated();
+        $data = $validated->validated();
         $Question = QuestionsModel::where([
             ["quiz_id", $data["quiz_id"]],
             ["id", $data["question"]],
         ])->get();
-        if($Question == null || $Question->count() <=0 ){
+        if ($Question == null || $Question->count() <= 0) {
 
             return Response()->json([
-                "success_message" => false, 
-                "data" => [], 
+                "success_message" => false,
+                "data" => [],
                 "error_message" => "The question could not found in the particular quiz",
-                "error_description" =>"",
+                "error_description" => "",
             ]);
         }
         $question = $Question[0];
@@ -199,5 +194,42 @@ class QuizController extends Controller
         }
         $question->delete();
         return Response()->json(["success_message" => true, "data" => $question]);
+    }
+
+    public function GetQuizAssignments(Request $request)
+    {
+        $admin = $request->user()->isAdmin;
+        if ($admin->quiz_permission < $admin->perm_read) {
+            if ($request->expectsJson())
+                return Response()->json(["success_message" => false, "data" => [], "error_message" => "Permission denied"]);
+            abort(403);
+        }
+        $validated = Validator::make($request->all(), [
+            "course_id" => "required|integer|exists:courses,id",
+        ]);
+        if ($validated->fails()) {
+            return Response()->json([
+                "success_message" => false,
+                "data" => [],
+                "error_message" => $validated->errors()->first(),
+                "error_description" => "",
+            ]);
+        }
+        $quizes = QuizesModel::where('course_id', $request->course_id)->get();
+        if ($quizes == null || $quizes->count() <= 0) {
+
+            return Response()->json([
+                "success_message" => false,
+                "data" => [],
+                "error_message" => "The assignments for the selected quiz could not be found",
+                "error_description" => "",
+            ]);
+        }
+
+
+        return Response()->json([
+            "success_message" => true,
+            "data" => $quizes
+        ]);
     }
 }

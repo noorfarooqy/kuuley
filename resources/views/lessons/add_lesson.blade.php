@@ -18,7 +18,7 @@
 
                 @if ($errors->any())
                 <div class="alert alert-danger">
-                    <i  class="fa fa-1x fa-info-circle"></i> {{$errors->first()}}
+                    <i class="fa fa-1x fa-info-circle"></i> {{$errors->first()}}
                 </div>
                 @elseif(Session::has('success'))
                 <div class="alert alert-success">
@@ -48,7 +48,7 @@
                                         @foreach ($sections as $section)
                                         @if (old('lessonSection') == $section->id)
                                         <option selected value="{{$section->id}}">{{$section->section_name}}</option>
-                                        @else 
+                                        @else
                                         <option value="{{$section->id}}">{{$section->section_name}}</option>
                                         @endif
 
@@ -61,30 +61,31 @@
                                 <div class="col-md-8 col-lg-8">
                                     <div class="form-group">
                                         <label for="fname">Title</label>
-                                        <input name="lessonTitle" type="text" class="form-control" placeholder="Title goes here"
-                                            value="{{old('lessonTitle')}}">
+                                        <input name="lessonTitle" type="text" class="form-control"
+                                            placeholder="Title goes here" value="{{old('lessonTitle')}}">
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-lg-4">
                                     <div class="form-group">
                                         <label for="lessonTpype">Lesson type</label>
-                                        <select name="lessonType" id="" class="form-control">
+                                        <select name="lessonType" id="" class="form-control"
+                                            @change.prevent="setSelectLesson($event, {{$course->id}})">
                                             <option value="-1">Select lesson type</option>
                                             @if (old('lessonType') == 1)
-                                                <option selected value="2">Normal lesson</option>
-                                                <option  value="1">Assignment</option>
+                                            <option selected value="2">Normal lesson</option>
+                                            <option value="1">Assignment</option>
                                             @elseif (old('lessonType') == 2)
-                                                <option value="2">Normal lesson</option>
-                                                <option selected value="1">Assignment</option>
+                                            <option value="2">Normal lesson</option>
+                                            <option selected value="1">Assignment</option>
                                             @else
-                                                <option value="2">Normal lesson</option>
-                                                <option value="1">Assignment</option>
+                                            <option value="2">Normal lesson</option>
+                                            <option value="1">Assignment</option>
                                             @endif
                                         </select>
                                     </div>
                                 </div>
                             </div>
-                            
+
 
                             <div class="form-group">
                                 <label for="desc">Description</label>
@@ -95,8 +96,9 @@
                             <div class="form-group mb-0">
                                 <label for="subscribe">Published</label><br>
                                 <div class="custom-control custom-checkbox-toggle custom-control-inline mr-1">
-                                    <input name="lessonIsPublished" checked="" type="checkbox" id="subscribe" class="custom-control-input">
-                                    <label  class="custom-control-label" for="subscribe">Yes</label>
+                                    <input name="lessonIsPublished" checked="" type="checkbox" id="subscribe"
+                                        class="custom-control-input">
+                                    <label class="custom-control-label" for="subscribe">Yes</label>
                                 </div>
                                 <label for="subscribe" class="mb-0">Yes</label>
                             </div>
@@ -105,7 +107,30 @@
 
 
                     </div>
-                    <div class="card">
+                    <div class="card" v-if="Assignments.length > 0">
+                        <div class="card-header card-header-large bg-light d-flex align-items-center">
+
+                            <h4 class="card-header__title">Assignment information</h4>
+                        </div>
+                        <div class="card-body">
+                            <ol>
+                                <li v-for="(assignment, akey) in Assignments" :key="akey">
+                                    <div class="form-group">
+
+                                        <input type="radio" name="assignmentId" :value="assignment.id" class="ml-3 p-1">
+                                        <label for="assigment" v-text="assignment.quiz_title"
+                                            class="label ml-3 p-1"></label>
+                                    </div>
+
+                                </li>
+                                <div class="">
+                                    <button type="submit" class="btn btn-success">Save Changes</button>
+                                </div>
+                            </ol>
+
+                        </div>
+                    </div>
+                    <div class="card" v-else>
                         <!-- Lessons -->
 
                         <div class="card-header card-header-large bg-light d-flex align-items-center">
@@ -116,21 +141,21 @@
                         <div class="card-body">
 
                             <div class="embed-responsive embed-responsive-16by9 mb-3">
-                                <iframe class="embed-responsive-item" ref="lessonFileUrl" 
-                                v-if="ResourceFile.file_type != 'video/mp4'" 
+                                <iframe class="embed-responsive-item" ref="lessonFileUrl"
+                                    v-if="ResourceFile.file_type != 'video/mp4'"
                                     src="https://player.vimeo.com/video/97243285?title=0&amp;byline=0&amp;portrait=0"
                                     allowfullscreen=""></iframe>
                                 <video src="https://player.vimeo.com/video/97243285?title=0&amp;byline=0&amp;portrait=0"
-                                v-else ref="lessonFileUrl" controls></video>
+                                    v-else ref="lessonFileUrl" controls></video>
                                 <input type="file" name="lessonResourceFile" style="display: none"
-                                @change="UpdateLessonFile" ref="lessonResourceFile" id="">
+                                    @change="UpdateLessonFile" ref="lessonResourceFile" id="">
                             </div>
                             <!-- Lessons -->
                             <div class="form-group mb-3">
-                                    <div class="avatar avatar-lg">
-                                        <img src="/assets/images/account-add-photo.svg" class="avatar-img rounded"
-                                            alt="..." data-dz-thumbnail="" @click="OpenFileHandler">
-                                    </div>
+                                <div class="avatar avatar-lg">
+                                    <img src="/assets/images/account-add-photo.svg" class="avatar-img rounded" alt="..."
+                                        data-dz-thumbnail="" @click="OpenFileHandler">
+                                </div>
                             </div>
                             <div class="card-body text-center">
 

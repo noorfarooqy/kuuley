@@ -20,9 +20,9 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::middleware('auth:api')->group(function () {
     Route::prefix('/admin')->group(function () {
         Route::post('/courses/list/instructor', 'courses\CourseController@GetInstructorCourseList');
+        Route::post('courses/quizes', 'quiz\QuizController@GetQuizAssignments');
         Route::post('/quiz/new', 'quiz\QuizController@NewQuestion');
         Route::post('/quiz/questions', 'quiz\QuizController@GetQuizQuestions');
         Route::post('/quiz/questions/delete', 'quiz\QuizController@DeteleQuestion');
     });
-
 });

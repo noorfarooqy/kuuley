@@ -13,6 +13,7 @@ var app = new Vue({
         },
         Errors: [],
         Questions: [],
+        Assignments: [],
     },
     mounted() {
 
@@ -35,6 +36,22 @@ var app = new Vue({
         previewResourceFile(filedata) {
             this.$refs.lessonFileUrl.src = filedata.currentTarget.result;
             console.log('file data ', filedata);
+        },
+        getAssignments(course_id) {
+            this.Server.setRequest({
+                api_token: window.api_token,
+                course_id: course_id
+            });
+            this.Server.serverRequest('/api/admin/courses/quizes', this.setAssignments, this.showError);
+        },
+        setAssignments(data) {
+            this.Assignments = data;
+        },
+        setSelectLesson(event, course) {
+            var index = event.target.options.selectedIndex;
+            if (index == 2) {
+                this.getAssignments(course)
+            }
         }
     }
 })
