@@ -4,6 +4,7 @@ namespace App;
 
 use App\models\admin\AdminsModel;
 use App\models\instructors\InstructorModel;
+use App\models\students\StudentInfoModel;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
@@ -81,5 +82,15 @@ class User extends Authenticatable
     public function HasInstructorInfo()
     {
         return $this->InstructorInfo()->count() > 0;
+    }
+
+
+    public function StudentInfo()
+    {
+        return $this->hasOne(StudentInfoModel::class, 'student_id', 'id');
+    }
+    public function HasStudentInfo()
+    {
+        return $this->StudentInfo()->count() > 0;
     }
 }

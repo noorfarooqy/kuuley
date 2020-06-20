@@ -57,17 +57,15 @@ class LessonsModel extends Model
                     $lessonType = $this->lesson_document;
             } else
                 $lessonType = $this->lesson_assignment;
-            return $this->update($this->setData($data, $uploaded_file, $lessonType, $assignment, $course_id, $section_id));
+            return $this->update($this->setData($data, $uploaded_file, $lessonType, $assignment, $section_id));
         } catch (Exception $e) {
-            //throw $th;
             $this->error_message = $e->getMessage();
             return false;
         }
     }
-    protected function setData($data, $uploaded_file, $lessonType, $assignment, $course_id, $section_id)
+    protected function setData($data, $uploaded_file, $lessonType, $assignment, $section_id)
     {
         return [
-            'course_id' => $course_id,
             'section_id' => $section_id,
             'lessonTitle' => $data["lessonTitle"],
             'lessonDescription' => $data["lessonDescription"],

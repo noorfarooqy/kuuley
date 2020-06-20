@@ -22,4 +22,9 @@ class CourseCategoryModel extends Model
             "created_by" => $creator
         ]);
     }
+
+    public function Courses()
+    {
+        return $this->hasMany(CoursesModel::class, 'course_category', 'id');
+    }
 }

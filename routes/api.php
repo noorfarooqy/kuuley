@@ -25,4 +25,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/quiz/questions', 'quiz\QuizController@GetQuizQuestions');
         Route::post('/quiz/questions/delete', 'quiz\QuizController@DeteleQuestion');
     });
+    Route::prefix('/student')->group(function () {
+        Route::post('/courses', 'students\StudentController@GetCoursesListApi');
+    });
 });

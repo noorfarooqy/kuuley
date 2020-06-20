@@ -209,10 +209,10 @@
 
                             <div class="embed-responsive embed-responsive-16by9 mb-3">
                                 <iframe class="embed-responsive-item" ref="lessonFileUrl"
-                                    v-if="ResourceFile.file_type != 'video/mp4'"
-                                    src="https://player.vimeo.com/video/97243285?title=0&amp;byline=0&amp;portrait=0"
+                                    v-if="{{$lesson->lesson_type == $lesson->lesson_document}}"
+                                    src="/storage/{{$lesson->lesson_url}}"
                                     allowfullscreen=""></iframe>
-                                <video src="https://player.vimeo.com/video/97243285?title=0&amp;byline=0&amp;portrait=0"
+                                <video src="/storage/{{$lesson->lesson_url}}"
                                     v-else ref="lessonFileUrl" controls></video>
                                 <input type="file" name="lessonResourceFile" style="display: none"
                                     @change="UpdateLessonFile" ref="lessonResourceFile" id="">

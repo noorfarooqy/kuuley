@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Storage;
 
 class LessonsController extends Controller
 {
+    public $error_message;
     public function __construct()
     {
         $this->error_message = null;
@@ -67,7 +68,7 @@ class LessonsController extends Controller
         }
     }
 
-    public function AddNewLession(Request $request, $course_id, $update = false)
+    public function AddNewLession(Request $request, $course_id, $update = false, $lessonModel = null)
     {
         $admin = $request->user()->isAdmin;
         abort_if($admin->quiz_permission < $admin->perm_write, 403);
@@ -80,7 +81,10 @@ class LessonsController extends Controller
         $data = $request->validate($this->GetNewLessonRules());
 
         if ($data["lessonType"] == 2) {
-            $uploaded_file = $this->UploadLessonFile($request, $course);
+            if (!isset($data["lessonResourceFile"]) && $update)
+                $uploaded_file = $lessonModel->lesson_url;
+            else
+                $uploaded_file = $this->UploadLessonFile($request, $course);
             if (!$uploaded_file)
                 return Redirect::back()->withErrors(['lessonResourceFile' => $this->error_message]);
             $mimetype = Storage::disk('public')->mimeType($uploaded_file);
@@ -101,8 +105,9 @@ class LessonsController extends Controller
         }
         $section = $section[0];
         $data["creator"] = $admin->user_id;
-        $lesson = $section->NewLesson($data, $uploaded_file, $mimetype, $assignment, $update);
+        $lesson = $section->NewLesson($data, $uploaded_file, $mimetype, $assignment, $update, $lessonModel);
         if ($update) {
+
             if (!$lesson) {
                 $this->error_message = $section->getError();
                 return false;
@@ -149,57 +154,15 @@ class LessonsController extends Controller
 
     public function UpdateLesson(Request $request, $course_id, $lesson_id)
     {
-
-        $updated = $this->AddNewLession($request, $course_id, true);
+        $lesson = LessonsModel::where("id", $lesson_id)->get();
+        abort_if($lesson == null || $lesson->count() <= 0, 404);
+        $updated = $this->AddNewLession($request, $course_id, true, $lesson[0]);
+        // return $updated;
+        // return [$updated, "something", $this->error_message];
         if (!$updated) {
             return Redirect::back()->withErrors(['lessonType' => $this->error_message]);
         }
         return Redirect::back()->with('success', 'successfully updated the lesson');
-        // $admin = $request->user()->isAdmin;
-        // abort_if($admin->quiz_permission < $admin->perm_read, 403);
-
-        // $course = CoursesModel::where('id', $course_id)->get();
-        // abort_if($course == null || $course->count() <= 0, 403);
-
-        // $course = $course[0];
-
-        // $lesson = LessonsModel::where("id", $lesson_id)->get();
-        // abort_if($lesson == null || $lesson->count() <= 0, 404);
-
-        // $data = $request->validate($this->GetNewLessonRules());
-
-        // if ($data["lessonType"] == 2) {
-        //     $uploaded_file = $this->UploadLessonFile($request, $course);
-        //     if (!$uploaded_file)
-        //         return Redirect::back()->withErrors(['lessonResourceFile' => $this->error_message]);
-
-        //     $mimetype = Storage::disk('public')->mimeType($uploaded_file);
-        //     $assignment = null;
-        // } else {
-        //     //ensure the assigment belongs to the given course
-        //     $assignment = $this->GetAssignmentInfo($course_id, $data);
-        //     if (!$assignment)
-        //         return Redirect::back()->withErrors(['assignmentId' => $this->error_message]);
-        //     $assignment = $assignment[0]->id;
-        //     $uploaded_file = null;
-        //     $mimetype = null;
-        // }
-        // $sections = LessonSectionsModel::where([
-        //     ['id', $data["lessonSection"]],
-        //     ["course_id", $course_id],
-        //     ['is_active', true],
-        // ])->get();
-        // if ($sections == null || $sections->count() <= 0) {
-        //     return Redirect::back()->withErrors(['lessonSection' => 'The lesson section doesnt correspond with the given course']);
-        // }
-        // $section = $sections[0];
-        // $data["creator"] = $admin->user_id;
-        // $updated_lesson = $section->UpdateLesson($data, $uploaded_file, $mimetype, $assignment);
-
-        // if ($updated_lesson) {
-        //     return Redirect::back()->with('success', 'Successfully added new lesson to the course and section');
-        // }
-        // return Redirect::back()->withErrors(['lesson' => $section->getError()]);
     }
 
 

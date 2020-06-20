@@ -17,16 +17,14 @@ class InstructorController extends Controller
             ['id', $instructor_id],
             ['is_student', false]
         ])->get();
-        if($Instructor->count() <= 0)
+        if ($Instructor->count() <= 0)
             abort(404);
         $user = $request->user();
-        if($user->id != $instructor_id)
-        {
+        if ($user->id != $instructor_id) {
             $admin_permissions = $user->isAdmin;
-            if($admin_permissions == null )
-                abort(404);
-            ;
-            if($admin_permissions->instructor_permission < $admin_permissions->perm_edit)
+            if ($admin_permissions == null)
+                abort(404);;
+            if ($admin_permissions->instructor_permission < $admin_permissions->perm_edit)
                 abort(403);
         }
         $rules = [
@@ -42,17 +40,13 @@ class InstructorController extends Controller
         $data = $request->validate($rules);
 
         $InstructorModel = new InstructorModel();
-        if($Instructor[0]->HasInstructorInfo())
-        {
+        if ($Instructor[0]->HasInstructorInfo()) {
             $InstructorInfo =  $Instructor[0]->InstructorInfo;
             $InstructorInfo = $InstructorInfo->updateBasic($data);
-        }
-            
-        else
+        } else
             $InstructorInfo = $InstructorModel->storeInfo($data, $instructor_id);
-        
-        return Redirect::back()->with('success', 'Successfully updated basic information');
 
+        return Redirect::back()->with('success', 'Successfully updated basic information');
     }
 
 
@@ -62,16 +56,14 @@ class InstructorController extends Controller
             ['id', $instructor_id],
             ['is_student', false]
         ])->get();
-        if($Instructor->count() <= 0)
+        if ($Instructor->count() <= 0)
             abort(404);
         $user = $request->user();
-        if($user->id != $instructor_id)
-        {
+        if ($user->id != $instructor_id) {
             $admin_permissions = $user->isAdmin;
-            if($admin_permissions == null )
-                abort(404);
-            ;
-            if($admin_permissions->instructor_permission < $admin_permissions->perm_edit)
+            if ($admin_permissions == null)
+                abort(404);;
+            if ($admin_permissions->instructor_permission < $admin_permissions->perm_edit)
                 abort(403);
         }
         $rules = [
@@ -85,17 +77,13 @@ class InstructorController extends Controller
         $data = $request->validate($rules);
 
         $InstructorModel = new InstructorModel();
-        if($Instructor[0]->HasInstructorInfo())
-        {
+        if ($Instructor[0]->HasInstructorInfo()) {
             $InstructorInfo =  $Instructor[0]->InstructorInfo;
             $InstructorInfo = $InstructorInfo->updateAddressInfo($data);
-        }
-            
-        else
+        } else
             $InstructorInfo = $InstructorModel->storeInfo($data, $instructor_id);
-        
-        return Redirect::back()->with('success', 'Successfully updated address information');
 
+        return Redirect::back()->with('success', 'Successfully updated address information');
     }
     public function UpdateSocialInfo(Request $request, $instructor_id)
     {
@@ -103,16 +91,14 @@ class InstructorController extends Controller
             ['id', $instructor_id],
             ['is_student', false]
         ])->get();
-        if($Instructor->count() <= 0)
+        if ($Instructor->count() <= 0)
             abort(404);
         $user = $request->user();
-        if($user->id != $instructor_id)
-        {
+        if ($user->id != $instructor_id) {
             $admin_permissions = $user->isAdmin;
-            if($admin_permissions == null )
-                abort(404);
-            ;
-            if($admin_permissions->instructor_permission < $admin_permissions->perm_edit)
+            if ($admin_permissions == null)
+                abort(404);;
+            if ($admin_permissions->instructor_permission < $admin_permissions->perm_edit)
                 abort(403);
         }
         $rules = [
@@ -126,16 +112,12 @@ class InstructorController extends Controller
         $data = $request->validate($rules);
 
         $InstructorModel = new InstructorModel();
-        if($Instructor[0]->HasInstructorInfo())
-        {
+        if ($Instructor[0]->HasInstructorInfo()) {
             $InstructorInfo =  $Instructor[0]->InstructorInfo;
             $InstructorInfo = $InstructorInfo->updateSocialInfo($data);
-        }
-            
-        else
+        } else
             $InstructorInfo = $InstructorModel->storeInfo($data, $instructor_id);
-        
-        return Redirect::back()->with('success', 'Successfully updated social information');
 
+        return Redirect::back()->with('success', 'Successfully updated social information');
     }
 }

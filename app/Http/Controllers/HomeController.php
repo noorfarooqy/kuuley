@@ -29,7 +29,7 @@ class HomeController extends Controller
     public function openDashboard(Request $request)
     {
         $user = $request->user();
-        if($user->is_student)
+        if ($user->is_student)
             return view('student.st_dashboard');
         else
             return view('instructor.ins_dashboard');

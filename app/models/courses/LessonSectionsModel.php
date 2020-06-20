@@ -34,9 +34,10 @@ class LessonSectionsModel extends Model
         }
     }
 
-    public function NewLesson($data, $uploaded_file, $mimetype, $assignment, $update = false)
+    public function NewLesson($data, $uploaded_file, $mimetype, $assignment, $update, $lessonModel)
     {
-        $lessonModel = new LessonsModel();
+        if ($lessonModel == null)
+            $lessonModel = new LessonsModel();
         if (!$update)
             $lesson = $lessonModel->NewLesson($data, $uploaded_file, $mimetype, $assignment, $this->course_id, $this->id);
         else
