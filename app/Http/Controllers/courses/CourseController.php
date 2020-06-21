@@ -140,6 +140,21 @@ class CourseController extends Controller
         $coursePreview = $Uploader->AddNewFile($file, $path);
         return $coursePreview;
     }
+    public function ViewCourseLessons(Request $request, $course_id)
+    {
+        $admin = $request->user()->isAdmin;
+        abort_if($admin->quiz_permission < $admin->perm_write, 403);
+
+        $course = CoursesModel::where('id', $course_id)->get();
+        abort_if($course == null || $course->count() <= 0, 404);
+
+        $course = $course[0];
+
+        $sections = $course->lessonSections;
+
+        return view('lessons.view_lessons', compact('course', 'sections'));
+    }
+
 
     //api calls
 
@@ -155,18 +170,35 @@ class CourseController extends Controller
         return Response()->json(["success_message" => true, 'data' => [$courses]]);
     }
 
-    public function ViewCourseLessons(Request $request, $course_id)
+
+    public function getCourseInfo(Request $request)
     {
-        $admin = $request->user()->isAdmin;
-        abort_if($admin->quiz_permission < $admin->perm_write, 403);
+        $user = $request->user();
+        $course = CoursesModel::where([
+            ["id", $request->course_id],
+        ])->with('Category', 'lessonSections', 'lessonSections.lessons')->get();
 
-        $course = CoursesModel::where('id', $course_id)->get();
-        abort_if($course == null || $course->count() <= 0, 404);
+        if ($course == null || $course->count() <= 0)
+            return $this->ResponseError("The course does not exists.");
+        return $this->ResponseSuccess($course[0]);
+    }
 
-        $course = $course[0];
 
-        $sections = $course->lessonSections;
 
-        return view('lessons.view_lessons', compact('course', 'sections'));
+    public function ResponseError($error, $error_description = null)
+    {
+        return Response()->json([
+            "success_message" => false,
+            "data" => [],
+            "error_message" => $error,
+            "error_description" => $error_description
+        ]);
+    }
+    public function ResponseSuccess($data)
+    {
+        return Response()->json([
+            "success_message" => true,
+            "data" => $data
+        ]);
     }
 }

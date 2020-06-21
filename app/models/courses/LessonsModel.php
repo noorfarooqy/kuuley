@@ -91,4 +91,12 @@ class LessonsModel extends Model
     {
         return $this->error_message;
     }
+    public function getLessonTypeName($type)
+    {
+        if ($type == $this->lesson_video)
+            return "video";
+        else if ($type == $this->lesson_document)
+            return "document";
+        return "Assignment";
+    }
 }

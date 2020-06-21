@@ -129,6 +129,21 @@ class StudentController extends Controller
 
         return view('student.courses_list', compact('student'));
     }
+    public function GetCourseInfoPage(Request $request, $course_id)
+    {
+        $student = $request->user();
+        abort_if(!$student->is_student, 404);
+
+        $StudentModel = $student->StudentInfo;
+        if ($StudentModel == null || $StudentModel->count() <= 0) {
+            return Redirect::route('studentProfile');
+        }
+        $student_id = $student->id;
+        $courseInfo = CoursesModel::where('id', $course_id)->get();
+        abort_if($courseInfo == null || $courseInfo->count() <= 0, 404);
+        $courseInfo = $courseInfo[0];
+        return view('courses.course_info', compact('student', 'courseInfo'));
+    }
 
 
 

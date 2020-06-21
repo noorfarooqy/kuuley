@@ -70,10 +70,11 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['verified'])->group(function () {
         Route::prefix('/student')->group(function () {
             Route::get('/profile', 'students\StudentController@OpenStudentProfile')->name('studentProfile');
-            Route::post('profile/update', 'students\StudentController@UpdateBasicInfo');
-            Route::post('profile/update/address', 'students\StudentController@UpdateAddressInfo');
-            Route::post('profile/update/socials', 'students\StudentController@UpdateSocialInfo');
-            Route::get('courses', 'students\StudentController@GetCoursesList');
+            Route::post('/profile/update', 'students\StudentController@UpdateBasicInfo');
+            Route::post('/profile/update/address', 'students\StudentController@UpdateAddressInfo');
+            Route::post('/profile/update/socials', 'students\StudentController@UpdateSocialInfo');
+            Route::get('/courses', 'students\StudentController@GetCoursesList');
+            Route::get('/courses/{course_id}', 'students\StudentController@GetCourseInfoPage');
         });
     });
 });
