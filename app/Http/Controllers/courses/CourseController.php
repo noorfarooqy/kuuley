@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\misc\UploadedFilesController;
 use App\models\courses\CourseCategoryModel;
 use App\models\courses\CoursesModel;
+use App\User;
 use Facade\FlareClient\Http\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -180,6 +181,16 @@ class CourseController extends Controller
 
         if ($course == null || $course->count() <= 0)
             return $this->ResponseError("The course does not exists.");
+
+        if ($user->is_student) {
+            $enroll_info = User::whereHas('enrolledCourses', function ($query) use ($course) {
+                $query->where('course_id', $course[0]->id);
+            })->get();
+            $course[0]->enroll_info = $enroll_info;
+            $course[0]->course_progress = 0; //TODO: course progress
+            $course[0]->is_enrolled = $enroll_info->count() > 0;
+        } else
+            $course[0]->is_enrolled = false;
         return $this->ResponseSuccess($course[0]);
     }
 

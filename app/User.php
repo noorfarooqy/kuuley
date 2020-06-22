@@ -3,6 +3,7 @@
 namespace App;
 
 use App\models\admin\AdminsModel;
+use App\models\courses\CourseEnrollsModel;
 use App\models\instructors\InstructorModel;
 use App\models\students\StudentInfoModel;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -92,5 +93,10 @@ class User extends Authenticatable
     public function HasStudentInfo()
     {
         return $this->StudentInfo()->count() > 0;
+    }
+
+    public function enrolledCourses()
+    {
+        return $this->hasMany(CourseEnrollsModel::class, 'student_id', 'id');
     }
 }
