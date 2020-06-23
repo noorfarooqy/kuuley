@@ -4,7 +4,9 @@ namespace App\Http\Controllers\students;
 
 use App\Http\Controllers\Controller;
 use App\models\courses\CourseCategoryModel;
+use App\models\courses\CourseEnrollsModel;
 use App\models\courses\CoursesModel;
+use App\models\courses\LessonsModel;
 use App\models\misc\CountryModel;
 use App\models\students\StudentInfoModel;
 use App\User;
@@ -143,6 +145,37 @@ class StudentController extends Controller
         abort_if($courseInfo == null || $courseInfo->count() <= 0, 404);
         $courseInfo = $courseInfo[0];
         return view('courses.course_info', compact('student', 'courseInfo'));
+    }
+
+    public function OpenCourseLessons(Request $request)
+    {
+        $user = $request->user();
+        abort_if(!$user->is_student, 403);
+
+        $EnrolledCourses = CourseEnrollsModel::where('student_id', $user->id)
+            ->with(['courseInfo'])->get();
+
+        return view('student.course_lessons', compact('user', 'EnrolledCourses'));
+    }
+
+    public function GetLessonEnrolled(Request $request, $course_id, $lesson_id)
+    {
+        $user = $request->user();
+        abort_if(!$user->is_student, 403);
+
+        $course = CoursesModel::where([
+            ['id', $course_id],
+            ['course_is_active', true]
+        ])->get();
+        abort_if($course == null || $course->count() <= 0, 404);
+
+        $lesson = LessonsModel::where('id', $lesson_id)->get();
+        abort_if($lesson == null || $lesson->count() <= 0, 404);
+        $lesson = $lesson[0];
+        $course = $course[0];
+        $sections = $course->lessonSections;
+
+        return view('lessons.view_lessons', compact('course', 'sections', 'lesson'));
     }
 
 

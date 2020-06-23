@@ -10,16 +10,24 @@
                     <div class="container-fluid page__heading-container">
                         <div class="page__heading d-flex flex-column flex-md-row align-items-center justify-content-center justify-content-lg-between text-center text-lg-left">
                             <div>
-                                <h1 class="m-lg-0"> {{$course->course_name}} </h1>
+                                @if (isset($lesson) && $lesson != null)
+                                <h1 class="m-lg-0" > {{$lesson->lessonTitle}} </h1>
                                 <div class="d-inline-flex align-items-center">
                                     <i class="material-icons icon-16pt mr-1 text-muted">access_time</i> 2 <small class="text-muted ml-1 mr-1">hours</small>: 26 <small class="text-muted ml-1">min</small>
                                 </div>
+                                @else
+                                <h1 class="m-lg-0" > {{$course->course_name}} </h1>
+                                <div class="d-inline-flex align-items-center">
+                                    <i class="material-icons icon-16pt mr-1 text-muted">access_time</i> 2 <small class="text-muted ml-1 mr-1">hours</small>: 26 <small class="text-muted ml-1">min</small>
+                                </div>
+                                @endif
+                                
                             </div>
                             <div>
-                                <a href="#" class="btn btn-success">
+                                {{-- <a href="#" class="btn btn-success">
                                     Purchase:
                                     <strong>$49</strong>
-                                </a>
+                                </a> --}}
                             </div>
                         </div>
                     </div>
@@ -33,7 +41,19 @@
                             @if ($sections->count() > 0 && $sections[0]->lessons->count() > 0)
                             <div class="col-md-8">
                                 
-                                <div class="card">
+                                @if (isset($lesson) && $lesson != null)
+                                 <div class="card" >
+                                    <div class="embed-responsive embed-responsive-16by9">
+                                        @if ($lesson->lesson_type == $lesson->lesson_document)
+                                        <iframe class="embed-responsive-item" src="/storage/{{$lesson->lesson_url}}" allowfullscreen=""></iframe>
+                                        @else
+                                        <video controls src="/storage/{{$lesson->lesson_url}}"></video>
+                                        @endif
+                                        
+                                    </div>
+                                </div>   
+                                @else
+                                <div class="card" >
                                     <div class="embed-responsive embed-responsive-16by9">
                                         @if ($sections[0]->lessons[0]->lesson_type == $sections[0]->lesson_document)
                                         <iframe class="embed-responsive-item" src="/storage/{{$sections[0]->lessons[0]->lesson_url}}" allowfullscreen=""></iframe>
@@ -43,6 +63,8 @@
                                         
                                     </div>
                                 </div>
+                                @endif
+                                
 
                                 {{-- <div class="card">
                                     <div class="card-header">
@@ -66,6 +88,18 @@
                                     </div>
                                 </div> --}}
 
+                                @if (isset($lesson) && $lesson != null)
+                                 <div class="card">
+                                    <div class="card-header card-header-large bg-light d-flex align-items-center">
+                                        <div class="flex">
+                                            <h4 class="card-header__title">lesson Description</h4>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        {{$lesson->lessonDescription}}
+                                    </div>
+                                </div>   
+                                @else
                                 <div class="card">
                                     <div class="card-header card-header-large bg-light d-flex align-items-center">
                                         <div class="flex">
@@ -75,7 +109,9 @@
                                     <div class="card-body">
                                         {{$course->course_description}}
                                     </div>
-                                </div>
+                                </div> 
+                                @endif
+                                
 
                             </div>
 
@@ -102,9 +138,16 @@
                                                     <div class="text-muted">{{$key+1}}</div>
                                                 </div>
                                                 <div class="media-body">
+                                                    @if (Auth::user()->isAdmin)
                                                     <a href="/admin/courses/{{$course->id}}/lessons/{{$lesson->id}}">
                                                     {{ strlen($lesson->lessonTitle) > 30  ? substr($lesson->lessonTitle,0,30).' ...' : $lesson->lessonTitle}}
                                                     </a>
+                                                    @else
+                                                    <a href="/student/courses/{{$course->id}}/lessons/{{$lesson->id}}">
+                                                    {{ strlen($lesson->lessonTitle) > 30  ? substr($lesson->lessonTitle,0,30).' ...' : $lesson->lessonTitle}}
+                                                    </a>
+                                                    @endif
+                                                    
                                                 </div>
                                                 <div class="media-right">
                                                     <small class="text-muted">

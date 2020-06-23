@@ -73,8 +73,11 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/profile/update', 'students\StudentController@UpdateBasicInfo');
             Route::post('/profile/update/address', 'students\StudentController@UpdateAddressInfo');
             Route::post('/profile/update/socials', 'students\StudentController@UpdateSocialInfo');
+            Route::get('/courses/lessons', 'students\StudentController@OpenCourseLessons');
+            Route::get('/courses/{course_id}/lessons/list', 'courses\CourseController@ViewCourseLessons');
             Route::get('/courses', 'students\StudentController@GetCoursesList');
             Route::get('/courses/{course_id}', 'students\StudentController@GetCourseInfoPage');
+            Route::get('/courses/{course_id}/lessons/{lesson_id}', 'students\StudentController@GetLessonEnrolled');
         });
     });
 });

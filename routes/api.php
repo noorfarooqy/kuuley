@@ -28,5 +28,6 @@ Route::middleware('auth:api')->group(function () {
     Route::prefix('/student')->group(function () {
         Route::post('/courses', 'students\StudentController@GetCoursesListApi');
         Route::post('/courses/info', 'courses\CourseController@getCourseInfo');
+        Route::post('/courses/enroll', 'courses\CourseController@EnrollRequest');
     });
 });

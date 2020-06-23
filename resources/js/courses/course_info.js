@@ -47,8 +47,34 @@ var app = new Vue({
                 toggle = 'block';
             $(loader).css('display', toggle);
         },
+        EnrollCourse() {
+            this.ToggleLoader(true);
+            this.Server.setRequest({
+                api_token: window.api_token,
+                course_id: this.Course != null ? this.Course.id : null,
+            });
+            this.Server.serverRequest('/api/student/courses/enroll', this.EnrolledCourse, this.showError);
+        },
+        EnrolledCourse(data) {
+            this.Course = data;
+            this.showSuccess('Request to enroll the course has been sent. You will receive email for confirmation.');
+            this.ToggleLoader();
+        },
         getRndInteger(min, max) {
             return Math.floor(Math.random() * (max - min)) + min;
-        }
+        },
+        showSuccess(message) {
+            // alert(error);
+            console.log('error ', message);
+            // this.Errors.push(error);
+            var alertor = document.querySelector('div.success-alert-toast');
+            console.log('laertor ', $(alertor).children('div.toast-danger').children('div.toast-message'));
+            $(alertor).css('display', 'block');
+            $(alertor).children('div.toast-success').children('div.toast-message').text(message);
+            setTimeout(function() {
+                $(alertor).css('display', 'none');
+            }, 10000);
+            this.ToggleLoader();
+        },
     }
 })

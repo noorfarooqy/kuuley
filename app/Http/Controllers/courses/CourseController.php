@@ -5,8 +5,11 @@ namespace App\Http\Controllers\courses;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\misc\UploadedFilesController;
 use App\models\courses\CourseCategoryModel;
+use App\models\courses\CourseEnrollsModel;
 use App\models\courses\CoursesModel;
+use App\Notifications\students\RequestToEnrollNotification;
 use App\User;
+use Exception;
 use Facade\FlareClient\Http\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -143,8 +146,11 @@ class CourseController extends Controller
     }
     public function ViewCourseLessons(Request $request, $course_id)
     {
-        $admin = $request->user()->isAdmin;
-        abort_if($admin->quiz_permission < $admin->perm_write, 403);
+        $user = $request->user();
+        if (!$user->is_student) {
+            $admin = $user->isAdmin;
+            abort_if($admin->quiz_permission < $admin->perm_write, 403);
+        }
 
         $course = CoursesModel::where('id', $course_id)->get();
         abort_if($course == null || $course->count() <= 0, 404);
@@ -191,6 +197,57 @@ class CourseController extends Controller
             $course[0]->is_enrolled = $enroll_info->count() > 0;
         } else
             $course[0]->is_enrolled = false;
+        return $this->ResponseSuccess($course[0]);
+    }
+
+    public function EnrollRequest(Request $request)
+    {
+        $user = $request->user();
+        $course = CoursesModel::where([
+            ["id", $request->course_id],
+        ])->with('Category', 'lessonSections', 'lessonSections.lessons')->get();
+
+        if ($course == null || $course->count() <= 0)
+            return $this->ResponseError("The course does not exists.");
+
+        if ($user->is_student) {
+            $enroll_info = User::whereHas('enrolledCourses', function ($query) use ($course) {
+                $query->where('course_id', $course[0]->id);
+            })->get();
+            $course[0]->enroll_info = $enroll_info;
+            $course[0]->course_progress = 0; //TODO: course progress
+            $course[0]->is_enrolled = $enroll_info->count() > 0;
+        } else
+            $course[0]->is_enrolled = false;
+        $student = $user->StudentInfo;
+        if ($student == null || $student->count() <= 0)
+            return $this->ResponseError('Please complete your profile information before requesting to enroll');
+        if ($course[0]->is_enrolled) {
+            if ($course[0]->enroll_info[0]->enroll_status == 10)
+                $error = "You have already requested to enroll in this course. It is still under review";
+            else if ($course[0]->enroll_info[0]->enroll_status == 20)
+                $error = "Your enroll to this course has been rejected. Please contact support for assistance";
+            else
+                $error = "You are already enrolled to this course";
+            return $this->ResponseError($error);
+        }
+        if (!$course[0]->course_is_active) {
+            return $this->ResponseError('This course is not active. Cannot enroll at the moment');
+        }
+        $EnrollModel = new CourseEnrollsModel();
+        $new_enroll = $EnrollModel->RequestToEnroll($user->id, $course[0]->id);
+        if (!$new_enroll) {
+            return $this->ResponseError($EnrollModel->getError());
+        }
+        $course[0]->enroll_info = $new_enroll;
+        $course[0]->is_enrolled = true;
+        $course[0]->course_progress = 0;
+        try {
+            $user->notify(new RequestToEnrollNotification($course[0], $student));
+        } catch (Exception $th) {
+            return $this->ResponseError('Failed to send notification email. ', $th->getMessage());
+        }
+
         return $this->ResponseSuccess($course[0]);
     }
 

@@ -35,6 +35,10 @@ class CourseEnrollsModel extends Model
             return false;
         }
     }
+    public function courseInfo()
+    {
+        return $this->belongsTo(CoursesModel::class, 'course_id', 'id');
+    }
     public function getError()
     {
         return $this->error_message;

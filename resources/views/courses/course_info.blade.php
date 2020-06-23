@@ -33,7 +33,10 @@
                                 <div class="text-muted">1.</div>
                             </div>
                             <div class="media-body">
-                                <a href="#">@{{lesson.lessonTitle}}</a>
+                                <a :href="'/student/course/'+Course.id+'/lessons/'+lesson.id">@{{lesson.lessonTitle}}</a>
+                                <span v-if="!Course.is_enrolled" class="ml-2">
+                                    <i class="fa fa-1x fa-lock"></i>
+                                </span>
                             </div>
                             <div class="media-right">
                                 <small class="text-muted" v-if="lesson.lesson_type == 10">Video</small>
@@ -122,10 +125,10 @@
                     </div>
                     <div class="ml-auto">
 
-                        <a href="#" class="btn btn-light text-muted" v-if="Course.is_enrolled"><i
+                        <a href="#"  @click.prevent="" class="btn btn-light text-muted" v-if="Course.is_enrolled"><i
                                 class="material-icons icon-16pt">check_circle</i> Complete</a>
 
-                        <a href="#" class="btn btn-light text-active" v-else><i
+                        <a href="#" @click.prevent="EnrollCourse()" class="btn btn-light text-active" v-else><i
                                 class="material-icons icon-16pt">check_circle</i> Enroll</a>
 
                     </div>
