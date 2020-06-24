@@ -168,7 +168,11 @@ class StudentController extends Controller
             ['course_is_active', true]
         ])->get();
         abort_if($course == null || $course->count() <= 0, 404);
-
+        $EnrollStatus = CourseEnrollsModel::where('course_id', $course_id)->get();
+        abort_if($EnrollStatus == null || $EnrollStatus->count() <= 0, 403);
+        if ($EnrollStatus[0]->enroll_status != $EnrollStatus[0]->status_approved) {
+            return view('errors.not_enrolled');
+        }
         $lesson = LessonsModel::where('id', $lesson_id)->get();
         abort_if($lesson == null || $lesson->count() <= 0, 404);
         $lesson = $lesson[0];

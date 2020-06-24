@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\models\courses\CourseEnrollsModel;
 use App\models\instructors\InstructorModel;
 use App\models\misc\CountryModel;
 use App\models\misc\PasswordResetModel;
 use App\Notifications\admin\NewAdminNotification;
+use App\Notifications\students\RequestToEnrollCourseApproved;
+use App\Notifications\students\RequestToEnrollCourseRejected;
 use App\Notifications\teachers\NewTeacherNotification;
 use App\User;
 use Carbon\Carbon;
@@ -23,7 +26,6 @@ class AdminController extends Controller
 
     public function __construct()
     {
-
     }
 
     public function openDashBoard(Request $request)
@@ -62,11 +64,9 @@ class AdminController extends Controller
     }
     protected function StudentWritePermission(Request $request)
     {
-
     }
     protected function HasWriteStudentPermission(Request $request)
     {
-
     }
     private function Permissions(Request $request)
     {
@@ -74,7 +74,6 @@ class AdminController extends Controller
         if ($user->isAdmin->count() <= 0) {
             return 0;
         }
-
     }
 
     public function NewTeacherOrAdminAccount(Request $request)
@@ -214,5 +213,78 @@ class AdminController extends Controller
         return view('courses.main_page');
     }
 
+    public function ViewStudentEnrolls(Request $request, $user_id)
+    {
+        $admin = $request->user()->isAdmin;
+        abort_if($admin->student_permission < $admin->perm_read, 403);
 
+        $user = User::where('id', $user_id)->get();
+        if ($user->count() <= 0) {
+            abort(404);
+        }
+
+        $student = $user[0];
+
+        $Enrollments = CourseEnrollsModel::where('student_id', $user_id)->with('courseInfo')->get();
+
+        return view('student.student_enrolls', compact('Enrollments', 'student'));
+    }
+
+    public function ApproveCourseEnroll(Request $request, $user_id, $enroll_id)
+    {
+        $Enrollments = $this->ValidateEnrollRequestInfo($request, $enroll_id, $user_id);
+        if (isset($Enrollments[0]) && isset($Enrollments[1])) {
+            $student = $Enrollments[1];
+            $Enrollments = $Enrollments[0];
+        }
+        abort_if(is_integer($Enrollments) && !$Enrollments instanceof CourseEnrollsModel, $Enrollments);
+        if ($Enrollments[0]->enroll_status == 10 || $Enrollments[0]->enroll_status == 20) {
+            $Enrollments[0]->update([
+                "enroll_status" => 30
+            ]);
+            $student->notify(new RequestToEnrollCourseApproved($Enrollments[0]->courseInfo, $student));
+
+            return Redirect::back()->with('success', 'successfully approved the enrollment for the student');
+        }
+        return Redirect::back()->withErrors(['enroll' => 'The enroll request is already approved']);
+    }
+    public function RejectCourseEnroll(Request $request, $user_id, $enroll_id)
+    {
+
+        $Enrollments = $this->ValidateEnrollRequestInfo($request, $enroll_id, $user_id);
+        if (isset($Enrollments[0]) && isset($Enrollments[1])) {
+            $student = $Enrollments[1];
+            $Enrollments = $Enrollments[0];
+        }
+        abort_if(is_integer($Enrollments) && !$Enrollments instanceof CourseEnrollsModel, $Enrollments);
+        if ($Enrollments[0]->enroll_status != 20) {
+            $Enrollments[0]->update([
+                "enroll_status" => 20
+            ]);
+
+            $student->notify(new RequestToEnrollCourseRejected($Enrollments[0]->courseInfo, $student));
+
+            return Redirect::back()->with('success', 'successfully rejected the enrollment for the student');
+        }
+        return Redirect::back()->withErrors(['enroll' => 'The enroll request is already rejected']);
+    }
+
+    public function ValidateEnrollRequestInfo($request, $enroll_id, $user_id)
+    {
+        $admin = $request->user()->isAdmin;
+        if ($admin->course_permission < $admin->perm_activate) return 403;
+
+        $user = User::where('id', $user_id)->get();
+        if ($user->count() <= 0) {
+            return 404;
+        }
+
+        $student = $user[0];
+
+        $Enrollments = CourseEnrollsModel::where('id', $enroll_id)->with('courseInfo')->get();
+        abort_if(is_integer($Enrollments) && !$Enrollments instanceof CourseEnrollsModel, $Enrollments);
+        if ($Enrollments == null || $Enrollments->count() <= 0) return 404;
+
+        return [$Enrollments, $student];
+    }
 }

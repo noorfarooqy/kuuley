@@ -8,7 +8,7 @@
 
     <div class="container-fluid page__heading-container">
         <div class="page__heading d-flex flex-column flex-md-row align-items-center justify-content-center justify-content-lg-between text-center text-lg-left">
-            <h1 class="m-lg-0">Users lists</h1>
+            <h1 class="m-lg-0">Student enrolls</h1>
             <div>
                 <a href="student-edit-account.html" class="btn btn-light ml-3"><i class="material-icons">edit</i> Edit</a>
                 <a href="student-profile.html" class="btn btn-success ml-1">View Profile <i class="material-icons">account_circle</i></a>
@@ -23,19 +23,21 @@
     <div class="container-fluid page__container">
         <div class="row">
             <div class="card col-lg-10 col-md-10" >
-                @if (Session::has('successmessage'))
+                @if (Session::has('success'))
                 <div class="alert alert-success">
-                    {{ Session::get('successmessage') }}
+                    {{ Session::get('success') }}
                 </div>
                 @endif
-                @error('user_id')
+                @if($errors->any())
                 <div class="alert alert-danger">
-                    {{ $message }}
+                    {{ $errors->first() }}
                 </div>
-                @enderror
+                @endif
                 <div class="card-header bg-primary text-white">
-                    Instructors list
+                    {{$student->name}}
                 </div>
+                @if ($Enrollments->count() <= 0)
+                @else
                 <div class="card-body">
                     <div class="table-responsive border-bottom" data-toggle="lists" data-lists-values='["js-lists-values-employee-name"]'>
 
@@ -50,14 +52,14 @@
     
                                     <th>Name</th>
     
-    
+                                    <th>Status</th>
                                     <th style="width: 120px;">Email</th>
                                     <th style="width: 120px;">Phone</th>
                                     <th style="width: 24px;"></th>
                                 </tr>
                             </thead>
                             <tbody class="list" id="staff02">
-                                @foreach ($students as $student)
+                                @foreach ($Enrollments as $enrolls)
                                 <tr>
     
                                     <td>
@@ -67,6 +69,24 @@
                                             {{$student->name}}
                                         </span>
     
+                                    </td>
+                                    <td>
+                                        {{$enrolls->courseInfo->course_name}}
+                                        
+                                            @if ($enrolls->enroll_status == 10)
+                                            <span class="badge badge-warning mr-2">
+                                                Review
+                                            </span>
+                                            @elseif($enrolls->enroll_status == 20)
+                                            <span class="badge badge-danger mr-2">
+                                                Rejected
+                                            </span>
+                                            @else  
+                                            <span class="badge badge-success mr-2">
+                                                Approved
+                                            </span>
+                                            @endif
+                                        
                                     </td>
     
     
@@ -78,6 +98,11 @@
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                             <a class="dropdown-item" href="/admin/student/{{$student->id}}" target="_blank">View profile</a>
                                             <a class="dropdown-item" href="/admin/student/{{$student->id}}/enrolls" target="_blank">Enrollments</a>
+                                            @if ($enrolls->enroll_status == 10)
+                                            <a class="dropdown-item" href="/admin/student/{{$student->id}}/enrolls/{{$enrolls->id}}/approve" >Approve</a>
+                                            <a class="dropdown-item" href="/admin/student/{{$student->id}}/enrolls/{{$enrolls->id}}/reject" >Reject</a>
+                                                                   
+                                            @endif
                                           </div>
                                         <form action="{{route('make-user-admin')}}" method="POST" id="make-admin-form">
                                             @csrf
@@ -93,7 +118,9 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
+                </div>  
+                @endif
+                
                 
             </div>
         </div>

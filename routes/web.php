@@ -39,6 +39,9 @@ Route::middleware(['auth'])->group(function () {
             Route::prefix('/student')->group(function () {
                 Route::get('/list', 'admin\AdminController@ViewStudentsList');
                 Route::get('/{student_id}', 'admin\AdminController@ViewStudentInfo');
+                Route::get('/{student_id}/enrolls', 'admin\AdminController@ViewStudentEnrolls');
+                Route::get('/{student_id}/enrolls/{enroll_id}/approve', 'admin\AdminController@ApproveCourseEnroll');
+                Route::get('/{student_id}/enrolls/{enroll_id}/reject', 'admin\AdminController@RejectCourseEnroll');
             });
             Route::prefix('/cat')->group(function () {
                 Route::post('/new', 'courses\CourseController@NewCourseCategory');
