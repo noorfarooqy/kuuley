@@ -13,6 +13,10 @@ var app = new Vue({
         Quizerrors: [],
         Server: new Server(),
         Questions: [],
+        Answer: {
+            question_id: null,
+            answer: null,
+        },
 
     },
     methods: {
@@ -26,22 +30,52 @@ var app = new Vue({
                 api_token: window.api_token,
                 quiz_id: window.quiz_id
             });
-            this.Server.serverRequest('/api/admin/quiz/questions', this.ShowQuizQuestions, this.ShowErrors);
+            this.Server.serverRequest('/api/admin/quiz/questions', this.ShowQuizQuestions, this.showErrors);
+        } else if (window.lesson_id != undefined && window.lesson_id != null) {
+            this.ToggleLoader(true);
+            this.Server.setRequest({
+                api_token: window.api_token,
+                lesson_id: window.lesson_id
+            });
+
+            this.Server.serverRequest('/api/student/quiz/questions', this.ShowQuizQuestions, this.showErrors);
         }
 
     },
     methods: {
+        setQuizQuestions(data) {
+            this.Questions = data;
+            this.ToggleLoader();
+        },
 
         ShowQuizQuestions(data) {
             console.log(data);
             data.forEach(question => {
                 this.AddNewQuestion(question);
             });
+            this.ToggleLoader();
         },
-        ShowErrors(error) {
-            console.log('Error ', error);
+        showErrors(error) {
+            // alert(error);
+            console.log('error ', error);
             this.Quizerrors.push(error);
-            alert(error);
+            var alertor = document.querySelector('div.error-alert-toast');
+            console.log('laertor ', $(alertor).children('div.toast-danger').children('div.toast-message'));
+            $(alertor).css('display', 'block');
+            $(alertor).children('div.toast-danger').children('div.toast-message').text(error);
+            setTimeout(function() {
+                $(alertor).css('display', 'none');
+            }, 10000);
+            this.ToggleLoader();
+        },
+        ToggleLoader(status) {
+            var loader = document.querySelector('div#modal-success');
+            var toggle;
+            if (status == null || status == false)
+                toggle = 'none';
+            else
+                toggle = 'block';
+            $(loader).css('display', toggle);
         },
         DeletedQuestion(question) {
             var ques = this.Questions.find(q => q.id == question.id);
@@ -64,9 +98,57 @@ var app = new Vue({
                 question: question_id,
                 quiz_id: quiz_id,
             });
-            this.Server.serverRequest('/api/admin/quiz/questions/delete', this.DeletedQuestion, this.ShowErrors);
+            this.Server.serverRequest('/api/admin/quiz/questions/delete', this.DeletedQuestion, this.showErrors);
 
-        }
+        },
+        submitAnswer(question) {
+
+            if (question.answer == null) {
+                this.showErrors('Please ensure you have selected an answer before saving');
+                return;
+            }
+            this.ToggleLoader(true);
+            this.Server.setRequest({
+                api_token: window.api_token,
+                question_id: question.id,
+                answer: question.answer
+            });
+            this.Server.serverRequest('/api/student/quiz/answer', this.answerSaved, this.showErrors);
+
+        },
+        submitQuiz() {
+
+        },
+        answerSaved(data) {
+            this.showSuccess('successfully saved the answer');
+        },
+
+        showSuccess(message) {
+            // alert(error);
+            console.log('error ', message);
+            // this.Errors.push(error);
+            var alertor = document.querySelector('div.success-alert-toast');
+            console.log('laertor ', $(alertor).children('div.toast-danger').children('div.toast-message'));
+            $(alertor).css('display', 'block');
+            $(alertor).children('div.toast-success').children('div.toast-message').text(message);
+            setTimeout(function() {
+                $(alertor).css('display', 'none');
+            }, 10000);
+            this.ToggleLoader();
+        },
+        showSuccess(message) {
+            // alert(error);
+            console.log('error ', message);
+            // this.Errors.push(error);
+            var alertor = document.querySelector('div.success-alert-toast');
+            console.log('laertor ', $(alertor).children('div.toast-danger').children('div.toast-message'));
+            $(alertor).css('display', 'block');
+            $(alertor).children('div.toast-success').children('div.toast-message').text(message);
+            setTimeout(function() {
+                $(alertor).css('display', 'none');
+            }, 10000);
+            this.ToggleLoader();
+        },
     },
     components: {
         'math-comp': maths,

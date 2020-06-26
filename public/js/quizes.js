@@ -52723,7 +52723,11 @@ var app = new Vue((_Vue = {
     p1: null,
     Quizerrors: [],
     Server: new _server__WEBPACK_IMPORTED_MODULE_3__["default"](),
-    Questions: []
+    Questions: [],
+    Answer: {
+      question_id: null,
+      answer: null
+    }
   },
   methods: {
     somefunction: function somefunction() {
@@ -52736,10 +52740,21 @@ var app = new Vue((_Vue = {
         api_token: window.api_token,
         quiz_id: window.quiz_id
       });
-      this.Server.serverRequest('/api/admin/quiz/questions', this.ShowQuizQuestions, this.ShowErrors);
+      this.Server.serverRequest('/api/admin/quiz/questions', this.ShowQuizQuestions, this.showErrors);
+    } else if (window.lesson_id != undefined && window.lesson_id != null) {
+      this.ToggleLoader(true);
+      this.Server.setRequest({
+        api_token: window.api_token,
+        lesson_id: window.lesson_id
+      });
+      this.Server.serverRequest('/api/student/quiz/questions', this.ShowQuizQuestions, this.showErrors);
     }
   }
-}, _defineProperty(_Vue, "methods", {
+}, _defineProperty(_Vue, "methods", _defineProperty({
+  setQuizQuestions: function setQuizQuestions(data) {
+    this.Questions = data;
+    this.ToggleLoader();
+  },
   ShowQuizQuestions: function ShowQuizQuestions(data) {
     var _this = this;
 
@@ -52747,11 +52762,26 @@ var app = new Vue((_Vue = {
     data.forEach(function (question) {
       _this.AddNewQuestion(question);
     });
+    this.ToggleLoader();
   },
-  ShowErrors: function ShowErrors(error) {
-    console.log('Error ', error);
+  showErrors: function showErrors(error) {
+    // alert(error);
+    console.log('error ', error);
     this.Quizerrors.push(error);
-    alert(error);
+    var alertor = document.querySelector('div.error-alert-toast');
+    console.log('laertor ', $(alertor).children('div.toast-danger').children('div.toast-message'));
+    $(alertor).css('display', 'block');
+    $(alertor).children('div.toast-danger').children('div.toast-message').text(error);
+    setTimeout(function () {
+      $(alertor).css('display', 'none');
+    }, 10000);
+    this.ToggleLoader();
+  },
+  ToggleLoader: function ToggleLoader(status) {
+    var loader = document.querySelector('div#modal-success');
+    var toggle;
+    if (status == null || status == false) toggle = 'none';else toggle = 'block';
+    $(loader).css('display', toggle);
   },
   DeletedQuestion: function DeletedQuestion(question) {
     var ques = this.Questions.find(function (q) {
@@ -52776,9 +52806,52 @@ var app = new Vue((_Vue = {
       question: question_id,
       quiz_id: quiz_id
     });
-    this.Server.serverRequest('/api/admin/quiz/questions/delete', this.DeletedQuestion, this.ShowErrors);
+    this.Server.serverRequest('/api/admin/quiz/questions/delete', this.DeletedQuestion, this.showErrors);
+  },
+  submitAnswer: function submitAnswer(question) {
+    if (question.answer == null) {
+      this.showErrors('Please ensure you have selected an answer before saving');
+      return;
+    }
+
+    this.ToggleLoader(true);
+    this.Server.setRequest({
+      api_token: window.api_token,
+      question_id: question.id,
+      answer: question.answer
+    });
+    this.Server.serverRequest('/api/student/quiz/answer', this.answerSaved, this.showErrors);
+  },
+  submitQuiz: function submitQuiz() {},
+  answerSaved: function answerSaved(data) {
+    this.showSuccess('successfully saved the answer');
+  },
+  showSuccess: function showSuccess(message) {
+    // alert(error);
+    console.log('error ', message); // this.Errors.push(error);
+
+    var alertor = document.querySelector('div.success-alert-toast');
+    console.log('laertor ', $(alertor).children('div.toast-danger').children('div.toast-message'));
+    $(alertor).css('display', 'block');
+    $(alertor).children('div.toast-success').children('div.toast-message').text(message);
+    setTimeout(function () {
+      $(alertor).css('display', 'none');
+    }, 10000);
+    this.ToggleLoader();
   }
-}), _defineProperty(_Vue, "components", {
+}, "showSuccess", function showSuccess(message) {
+  // alert(error);
+  console.log('error ', message); // this.Errors.push(error);
+
+  var alertor = document.querySelector('div.success-alert-toast');
+  console.log('laertor ', $(alertor).children('div.toast-danger').children('div.toast-message'));
+  $(alertor).css('display', 'block');
+  $(alertor).children('div.toast-success').children('div.toast-message').text(message);
+  setTimeout(function () {
+    $(alertor).css('display', 'none');
+  }, 10000);
+  this.ToggleLoader();
+})), _defineProperty(_Vue, "components", {
   'math-comp': _components_maths_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
   'quiz-info': _components_quiz_info_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
 }), _Vue));

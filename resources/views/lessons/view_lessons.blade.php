@@ -11,8 +11,8 @@
         <div
             class="page__heading d-flex flex-column flex-md-row align-items-center justify-content-center justify-content-lg-between text-center text-lg-left">
             <div>
-                @if (isset($lesson) && $lesson != null)
-                <h1 class="m-lg-0"> {{$lesson->lessonTitle}} </h1>
+                @if (isset($viewLesson) && $viewLesson != null)
+                <h1 class="m-lg-0"> {{$viewLesson->lessonTitle}} </h1>
                 <div class="d-inline-flex align-items-center">
                     <i class="material-icons icon-16pt mr-1 text-muted">access_time</i> 2 <small
                         class="text-muted ml-1 mr-1">hours</small>: 26 <small class="text-muted ml-1">min</small>
@@ -44,17 +44,97 @@
             @if ($sections->count() > 0 && $sections[0]->lessons->count() > 0)
             <div class="col-md-8">
 
-                @if (isset($lesson) && $lesson != null)
+                @if (isset($viewLesson) && $viewLesson != null)
                 <div class="card">
-                    <div class="embed-responsive embed-responsive-16by9">
-                        @if ($lesson->lesson_type == $lesson->lesson_document)
-                        <iframe class="embed-responsive-item" src="/storage/{{$lesson->lesson_url}}"
-                            allowfullscreen=""></iframe>
-                        @else
-                        <video controls src="/storage/{{$lesson->lesson_url}}"></video>
-                        @endif
 
+                    @if ($viewLesson->lesson_type == $viewLesson->lesson_document)
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <iframe class="embed-responsive-item" src="/storage/{{$viewLesson->lesson_url}}"
+                            allowfullscreen=""></iframe>
                     </div>
+                    @elseif($viewLesson->lesson_type == $viewLesson->lesson_assignment)
+                    @php
+                    $Questions = $viewLesson->Assignment->Questions;
+                    @endphp
+
+        
+                    <div class="card mb-4" data-position="1" data-question-id="1" v-for="(question,qkey) in Questions">
+                        <div class="card-header d-flex justify-content-between">
+                            <div class="d-flex align-items-center ">
+
+                                <span class="question_handle btn btn-sm btn-secondary">
+                                    <i class="material-icons">menu</i>
+                                </span>
+                                <div class="h4 m-0 ml-4">
+                                    <vue-mathjax :formula="'$$' + question.question_text + '$$'"></vue-mathjax>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+
+                            <div id="answerWrapper_1" class="mb-4" v-if="question.question_type == 1">
+
+                                <ul class="list-group" id="answer_container_1">
+                                    <li class="list-group-item d-flex" data-position="1" data-answer-id="1"
+                                        data-question-id="1">
+                                        <span class="mr-2"><i class="material-icons text-light-gray">menu</i></span>
+                                        <div>
+                                            False
+                                        </div>
+                                        <div class="ml-auto">
+                                            <input type="radio" v-model="question.answer" :name="'answer'+question.id" id="" 
+                                            class="form-control-input" :value="0">
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item d-flex" data-position="2" data-answer-id="2"
+                                        data-question-id="2">
+                                        <span class="mr-2"><i class="material-icons text-light-gray">menu</i></span>
+                                        <div>
+                                            True
+                                        </div>
+                                        <div class="ml-auto">
+                                            <input type="radio" :value="1" v-model="question.answer" :name="'answer'+question.id" 
+                                            id="" class="form-control-input">
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div id="answerWrapper_1" class="mb-4" v-else>
+
+                                <ul class="list-group" id="answer_container_1">
+                                    <li class="list-group-item d-flex" data-position="1" data-answer-id="1"
+                                        data-question-id="1" v-for="(answer, akey) in question.answers" :key="akey">
+                                        <span class="mr-2"><i class="material-icons text-light-gray">menu</i></span>
+                                        <div >
+                                            <vue-mathjax :formula="'$$ '+answer.answer_text+' $$'"></vue-mathjax>
+                                        </div>
+                                        <div class="ml-auto">
+                                            
+                                            <input type="radio" v-model="question.answer" :name="'answer'+question.id" id="" class="form-control-input" 
+                                            v-if="question.question_type == 2" :value="answer.id">
+
+                                            <input type="checkbox" :name="'answer'+question.id+'_'+akey" :value="answer.id"
+                                             class="form-control-input" v-else v-model="question.answer" >
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="mt-3 mb-3 center">
+                                <input type="submit" value="Save" class="btn btn-primary" @click.prevent="submitAnswer(question)">
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="btn btn-primary" @click.prevent="submitQuiz">Submit Assignment</div>
+
+                    @else
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <video controls src="/storage/{{$viewLesson->lesson_url}}"></video>
+                    </div>
+
+                    @endif
+
                 </div>
                 @else
                 <div class="card">
@@ -70,30 +150,7 @@
                 </div>
                 @endif
 
-
-                {{-- <div class="card">
-                                    <div class="card-header">
-                                        <div class="media align-items-center">
-                                            <div class="media-left">
-                                                <img src="/assets/images/256_luke-porter-261779-unsplash.jpg" alt="About Adrian" width="40" class="rounded-circle">
-                                            </div>
-                                            <div class="media-body">
-                                                <div class="card-title mb-0"><a href="student-profile.html" class="text-body"><strong>Adrian Demian</strong></a></div>
-                                                <p class="text-muted mb-0">Instructor</p>
-                                            </div>
-                                            <div class="media-right">
-                                                <a href="" class="btn btn-facebook btn-sm"><i class="fab fa-facebook"></i></a>
-                                                <a href="" class="btn btn-twitter btn-sm"><i class="fab fa-twitter"></i></a>
-                                                <a href="" class="btn btn-light btn-sm"><i class="fab fa-github"></i></a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-body">
-                                        Having over 12 years exp. Adrian is one of the lead UI designers in the industry Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facere, aut.
-                                    </div>
-                                </div> --}}
-
-                @if (isset($lesson) && $lesson != null)
+                @if (isset($viewLesson) && $viewLesson != null)
                 <div class="card">
                     <div class="card-header card-header-large bg-light d-flex align-items-center">
                         <div class="flex">
@@ -101,7 +158,7 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        {{$lesson->lessonDescription}}
+                        {{$viewLesson->lessonDescription}}
                     </div>
                 </div>
                 @else
@@ -234,4 +291,21 @@
 
 </div>
 
+@endsection
+
+
+@section('scripts')
+@if (isset($viewLesson) && $viewLesson != null)
+    
+<script>
+
+window.lesson_id = "{{$viewLesson->id}}";
+window.api_token = "{{Auth::user()->api_token}}";
+
+</script>
+@endif
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_HTML"></script>
+
+<script src="/js/quizes.js"></script>
+{{-- <link id="themecss" rel="stylesheet" type="text/css" href="//www.shieldui.com/shared/compon            <div class="card-header">ents/latest/css/light/all.min.css" /> --}}
 @endsection

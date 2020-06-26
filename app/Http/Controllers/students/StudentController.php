@@ -175,11 +175,12 @@ class StudentController extends Controller
         }
         $lesson = LessonsModel::where('id', $lesson_id)->get();
         abort_if($lesson == null || $lesson->count() <= 0, 404);
-        $lesson = $lesson[0];
+        $viewLesson = $lesson[0];
         $course = $course[0];
+        // return [$lesson];
         $sections = $course->lessonSections;
 
-        return view('lessons.view_lessons', compact('course', 'sections', 'lesson'));
+        return view('lessons.view_lessons', compact('course', 'sections', 'viewLesson'));
     }
 
 

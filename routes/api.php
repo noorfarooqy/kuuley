@@ -29,5 +29,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/courses', 'students\StudentController@GetCoursesListApi');
         Route::post('/courses/info', 'courses\CourseController@getCourseInfo');
         Route::post('/courses/enroll', 'courses\CourseController@EnrollRequest');
+        Route::post('/quiz/questions', 'quiz\QuizController@GetQuizQuestionsForStudent');
+        Route::post('/quiz/answer', 'quiz\QuizController@AnswerQuestion');
     });
 });

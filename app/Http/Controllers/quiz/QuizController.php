@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\quiz;
 
 use App\Http\Controllers\Controller;
+use App\models\courses\LessonsModel;
+use App\models\quiz\AnswersModel;
 use App\models\quiz\QuestionsModel;
 use App\models\quiz\QuizesModel;
+use App\models\students\QuestionResultsModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
@@ -91,6 +94,44 @@ class QuizController extends Controller
 
         return Response()->json(["success_message" => true, "data" => $questions]);
     }
+    public function GetQuizQuestionsForStudent(Request $request)
+    {
+        $user = $request->user();
+        if (!$user->is_student) {
+            if ($request->expectsJson())
+                return Response()->json(["success_message" => false, "data" => [], "error_message" => "Permission denied"]);
+            abort(403);
+        }
+        $validated = Validator::make($request->all(), [
+            "lesson_id" => "required|integer|exists:lessons,id",
+        ]);
+        if ($validated->fails()) {
+            return Response()->json(["success_message" => false, "data" => [], "error_message" => $validated->errors()->first()]);
+        }
+        $lesson = LessonsModel::where('id', $request->lesson_id)->get();
+        if ($lesson == null || $lesson->count() <= 0) {
+            return Response()->json(["success_message" => false, "data" => [], "error_message" => "could not find the lesson info"], 404);
+        } else if ($lesson[0]->lesson_type != 30) {
+            return Response()->json(["success_message" => false, "data" => [], "error_message" => "The lesson type is not assignment"], 200);
+        }
+        $quiz = $lesson[0]->Assignment;
+
+        // return [$quiz, $lesson];
+        if ($quiz == null || $quiz->count() <= 0) {
+            return Response()->json(["success_message" => false, "data" => [], "error_message" => "could not find the quiz"], 404);
+        }
+
+        $questions = $quiz->Questions;
+        foreach ($questions as $key => $question) {
+            $question->Answers;
+            if ($question->question_type == 3)
+                $questions[$key]->answer = [];
+            else
+                $questions[$key]->answer = null;
+        }
+        return Response()->json(["success_message" => true, "data" => $questions]);
+    }
+
 
     public function NewQuestion(Request $request)
     {
@@ -230,6 +271,110 @@ class QuizController extends Controller
         return Response()->json([
             "success_message" => true,
             "data" => $quizes
+        ]);
+    }
+
+
+
+    // api
+
+
+    public function AnswerQuestion(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user->is_student) {
+            return $this->ResponseError('Permission denied.');
+        }
+
+        $rules = [
+            "question_id" => "required|integer|exists:questions,id",
+            "answer" => "required",
+            "question_type" => "nullable|integer|in:2"
+        ];
+
+
+        $data = $request->validate($rules);
+        $question = QuestionsModel::where('id', $request->question_id)->get()[0];
+        if ($question->is_deleted)
+            return $this->ResponseError('The particular queston does not exist or has been deleted ');
+        $lesson = LessonsModel::where('assignment_id', $question->quiz_id)->get();
+        // return [$lesson];
+        if (($lesson == null || $lesson->count() <= 0) && $request->question_type == null)
+            return $this->ResponseError('The lesson to this assignment could not be found');
+        $answers = AnswersModel::where('question_id', $request->question_id)->get();
+        if ($answers == null || $answers->count() <= 0)
+            return $this->ResponseError('Please ensure you have selected an answer');
+        // return [$answers, $data["answer"]];
+        if (is_array($data['answer'])) {
+
+            $has_answer = 0;
+            foreach ($answers as $key => $answer) {
+                if (in_array($answer->id, $data["answer"])) {
+                    $has_answer = $has_answer + 1;
+                }
+            }
+            if ($has_answer != count($data["answer"])) {
+                return $this->ResponseError('The answer you have given does not match with the question answers. ');
+            }
+
+            // return [$has_answer, "array type answer"];
+        } else if ($question->question_type === 1) {
+            if ($data["answer"] != true && $data["answer"] != false)
+                return $this->ResponseError('The answer you have provided is invalid');
+        } else if (!AnswersModel::where([
+            ['id', $data["answer"]], ['question_id', $question->id]
+        ])->exists()) {
+            return $this->ResponseError('The answer you have given couldnt be found in the question choices');
+        }
+
+        $AnswerResultModel = new QuestionResultsModel();
+
+        $results = [];
+        if (is_array($data["answer"])) {
+            foreach ($data["answer"] as $key => $answer) {
+                $AnswerResultModel->question_three_progress = $question->question_type == 3 && $key > 0;
+                // array_push($results, $AnswerResultModel->question_three_progress);
+                $new_result = $AnswerResultModel->AnswerQuestion($question, $answer, $user->id);
+                if (!$new_result) {
+                    foreach ($results as $key => $result) {
+                        $result->delete();
+                    }
+
+                    return $this->ResponseError(
+                        'Failed to save the new answer to your question',
+                        $AnswerResultModel->getError()
+                    );
+                }
+                array_push($results, $new_result);
+            }
+        } else {
+            $new_result = $AnswerResultModel->AnswerQuestion($question, $data['answer'], $user->id);
+            if (!$new_result) {
+                return $this->ResponseError(
+                    'Failed to save the new answer to your question',
+                    $AnswerResultModel->getError()
+                );
+            }
+        }
+
+        return $this->ResponseSuccess($results, 'successully saved the answer');
+    }
+
+    public function ResponseError($error, $error_description = null)
+    {
+        return Response()->json([
+            "success_message" => false,
+            "data" => [],
+            "error_message" => $error,
+            "error_description" => $error_description
+        ]);
+    }
+    public function ResponseSuccess($data, $message = 'successful')
+    {
+        return Response()->json([
+            "success_message" => $message,
+            "data" => $data
         ]);
     }
 }
