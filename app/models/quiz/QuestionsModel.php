@@ -2,6 +2,7 @@
 
 namespace App\models\quiz;
 
+use App\models\students\QuestionResultsModel;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 
@@ -26,7 +27,7 @@ class QuestionsModel extends Model
             $question =  $this->AddQuestion($data, $quiz_id, $this->trueOrFalseType);
             $AnswerModel = new AnswersModel();
             $Answer = $AnswerModel->AddAnswer($data["answers"], $question);
-            if(!$Answer){
+            if (!$Answer) {
                 $question->delete();
                 $this->error = $AnswerModel->getError();
                 return false;
@@ -40,10 +41,10 @@ class QuestionsModel extends Model
     public function NewChoiceQuestion($data, $quiz_id)
     {
         try {
-            $question =  $this->AddQuestion($data,$quiz_id, $this->singChoiceQuestion);
+            $question =  $this->AddQuestion($data, $quiz_id, $this->singChoiceQuestion);
             $AnswerModel = new AnswersModel();
             $Answer = $AnswerModel->AddAnswer($data["answers"], $question);
-            if(!$Answer){
+            if (!$Answer) {
                 $question->delete();
                 $this->error = $AnswerModel->getError();
                 return false;
@@ -66,10 +67,16 @@ class QuestionsModel extends Model
 
     public function Answers()
     {
-        return $this->hasMany(AnswersModel::class, 'question_id','id');
+        return $this->hasMany(AnswersModel::class, 'question_id', 'id');
     }
 
-    public function getError(){
+    public function ResultsSubmitted()
+    {
+        return $this->hasMany(QuestionResultsModel::class, 'question_id', 'id');
+    }
+
+    public function getError()
+    {
         return $this->error;
     }
 }

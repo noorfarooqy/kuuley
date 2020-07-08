@@ -8,7 +8,6 @@ Vue.use(VueMathjax)
 var app = new Vue({
     el: "#app",
     data: {
-        p1: null,
         Quizerrors: [],
         Server: new Server(),
         Questions: [],
@@ -17,6 +16,11 @@ var app = new Vue({
             answer: null,
         },
         SubmittedResults: [],
+        QuizData: {
+            title: '',
+            desc: ''
+        },
+        courseLessons: null
 
     },
     methods: {
@@ -25,35 +29,24 @@ var app = new Vue({
         }
     },
     mounted() {
-        if (window.quiz_id != undefined && window.quiz_id != null) {
-            this.Server.setRequest({
-                api_token: window.api_token,
-                quiz_id: window.quiz_id
-            });
-            this.Server.serverRequest('/api/admin/quiz/questions', this.ShowQuizQuestions, this.showErrors);
-        } else if (window.lesson_id != undefined && window.lesson_id != null) {
-            this.ToggleLoader(true);
-            this.Server.setRequest({
-                api_token: window.api_token,
-                lesson_id: window.lesson_id
-            });
 
-            this.Server.serverRequest('/api/student/quiz/questions', this.setQuizQuestions, this.showErrors);
-        }
 
     },
     methods: {
+        GetDiagnostic(quiz) {
+            this.ToggleLoader(true);
+            this.Server.setRequest({
+                api_token: window.api_token,
+                quiz: quiz.id
+            })
+            this.QuizData.title = quiz.quiz_title;
+            this.QuizData.desc = quiz.quiz_instructions;
+
+            this.Server.serverRequest('/api/student/quiz/diag', this.setQuizQuestions, this.showErrors);
+        },
         setQuizQuestions(data) {
             this.Questions = data[0];
             this.SubmittedResults = data[1];
-            this.ToggleLoader();
-        },
-
-        ShowQuizQuestions(data) {
-            console.log(data);
-            data.forEach(question => {
-                this.AddNewQuestion(question);
-            });
             this.ToggleLoader();
         },
         showErrors(error) {
@@ -78,29 +71,38 @@ var app = new Vue({
                 toggle = 'block';
             $(loader).css('display', toggle);
         },
-        DeletedQuestion(question) {
-            var ques = this.Questions.find(q => q.id == question.id);
-            var index = this.Questions.indexOf(ques);
-            if (index < 0) {
-                alert('Question deleted successfully, could not remove from the list. Refresh the page');
-            } else {
-                console.log('index to remove ', index);
-                this.Questions.splice(index, 1);
-                alert('succesfully deleted the question');
+        showSuccess(message) {
+            // alert(error);
+            console.log('error ', message);
+            // this.Errors.push(error);
+            var alertor = document.querySelector('div.success-alert-toast');
+            console.log('laertor ', $(alertor).children('div.toast-danger').children('div.toast-message'));
+            $(alertor).css('display', 'block');
+            $(alertor).children('div.toast-success').children('div.toast-message').text(message);
+            setTimeout(function() {
+                $(alertor).css('display', 'none');
+            }, 10000);
+            this.ToggleLoader();
+        },
+        GetLessons(event) {
+            this.ToggleLoader(true);
+            console.log('evenet ', event);
+            var index = event.target.options.selectedIndex;
+            var course_id = event.target.options[index].value;
+            if (course_id <= 0) {
+                this.ToggleLoader();
+                this.courseLessons = null;
+                return;
             }
-
-        },
-        AddNewQuestion(question) {
-            this.Questions.push(question);
-        },
-        DeleteQuestion(question_id, quiz_id) {
             this.Server.setRequest({
                 api_token: window.api_token,
-                question: question_id,
-                quiz_id: quiz_id,
+                course_id: course_id
             });
-            this.Server.serverRequest('/api/admin/quiz/questions/delete', this.DeletedQuestion, this.showErrors);
-
+            this.Server.serverRequest('/api/courses/lessons', this.setCourseLessons, this.showErrors);
+        },
+        setCourseLessons(data) {
+            this.courseLessons = data;
+            this.ToggleLoader();
         },
         submitAnswer(question) {
 
@@ -130,19 +132,6 @@ var app = new Vue({
         },
         answerSaved(data) {
             this.showSuccess('successfully saved the answer');
-        },
-        showSuccess(message) {
-            // alert(error);
-            console.log('error ', message);
-            // this.Errors.push(error);
-            var alertor = document.querySelector('div.success-alert-toast');
-            console.log('laertor ', $(alertor).children('div.toast-danger').children('div.toast-message'));
-            $(alertor).css('display', 'block');
-            $(alertor).children('div.toast-success').children('div.toast-message').text(message);
-            setTimeout(function() {
-                $(alertor).css('display', 'none');
-            }, 10000);
-            this.ToggleLoader();
         },
     },
     components: {

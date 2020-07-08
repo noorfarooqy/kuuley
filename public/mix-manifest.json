@@ -4,5 +4,7 @@
     "/js/course_info.js": "/js/course_info.js",
     "/js/courses_list.js": "/js/courses_list.js",
     "/js/lesson.js": "/js/lesson.js",
-    "/js/quizes.js": "/js/quizes.js"
+    "/js/quiz_report.js": "/js/quiz_report.js",
+    "/js/quizes.js": "/js/quizes.js",
+    "/js/student_diag.js": "/js/student_diag.js"
 }

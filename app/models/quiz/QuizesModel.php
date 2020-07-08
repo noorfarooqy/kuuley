@@ -3,11 +3,12 @@
 namespace App\models\quiz;
 
 use App\models\courses\CoursesModel;
+use App\models\students\QuestionResultsModel;
 use Illuminate\Database\Eloquent\Model;
 
 class QuizesModel extends Model
 {
-        
+
     protected $table = "quizes";
     protected $fillable = [
         "quiz_title",
@@ -19,50 +20,59 @@ class QuizesModel extends Model
         "is_deleted",
         "created_by",
     ];
-    protected $error =null;
-    public function GetQuizTypeName(){
+    protected $error = null;
+    public function GetQuizTypeName()
+    {
         return $this->is_diagnostic ? "Diagnostic Quiz" : "Course Assignment";
     }
-    public function GetCourseName(){
+    public function GetCourseName()
+    {
         $course = $this->QuizCourseInfo;
-        return $course == null ? "Uknown course" : $course->course_name ;
+        return $course == null ? "Uknown course" : $course->course_name;
     }
 
-    public function QuizCourseInfo(){
-        return $this->belongsTo(CoursesModel::class, 'course_id','id');
+    public function QuizCourseInfo()
+    {
+        return $this->belongsTo(CoursesModel::class, 'course_id', 'id');
     }
 
-    public function Questions(){
-        return $this->hasMany(QuestionsModel::class, 'quiz_id','id');
+    public function Questions()
+    {
+        return $this->hasMany(QuestionsModel::class, 'quiz_id', 'id');
+    }
+    public function Trials()
+    {
+        return $this->hasMany(QuestionResultsModel::class, 'quiz_id', 'id');
     }
 
     public function AddNewQuestion($data)
     {
         $QuestionModel = new QuestionsModel();
-        if($data["question_type"] == $QuestionModel->trueOrFalseType){
+        if ($data["question_type"] == $QuestionModel->trueOrFalseType) {
             $newQuestion = $QuestionModel->NewTrueOrFalseQuestion($data, $this->id);
-            if(!$newQuestion){
+            if (!$newQuestion) {
                 $this->error = $QuestionModel->getError();
                 return true;
             }
             return $newQuestion;
-        }
-        else if($data["question_type"] == $QuestionModel->singChoiceQuestion || 
-        $data["question_type"] == $QuestionModel->multiChoiceQuestion){
+        } else if (
+            $data["question_type"] == $QuestionModel->singChoiceQuestion ||
+            $data["question_type"] == $QuestionModel->multiChoiceQuestion
+        ) {
             $newQuestion = $QuestionModel->NewChoiceQuestion($data, $this->id);
-            if(!$newQuestion){
+            if (!$newQuestion) {
                 $this->error = $QuestionModel->getError();
                 return true;
             }
             return $newQuestion;
-        }
-        else {
+        } else {
             $this->error = "Unsupporeted question type";
             return false;
         }
     }
 
-    public function getError(){
+    public function getError()
+    {
         return $this->error;
     }
 }

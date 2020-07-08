@@ -8,6 +8,8 @@ use App\models\quiz\AnswersModel;
 use App\models\quiz\QuestionsModel;
 use App\models\quiz\QuizesModel;
 use App\models\students\QuestionResultsModel;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
@@ -120,16 +122,53 @@ class QuizController extends Controller
         if ($quiz == null || $quiz->count() <= 0) {
             return Response()->json(["success_message" => false, "data" => [], "error_message" => "could not find the quiz"], 404);
         }
-
+        $Trails = $quiz->Trials->where('trail_completed', true)->where('student_id', $user->id);
+        $trail_list = [];
+        // $trail_result = new Collection();
+        $trail_result = [];
         $questions = $quiz->Questions;
-        foreach ($questions as $key => $question) {
-            $question->Answers;
-            if ($question->question_type == 3)
-                $questions[$key]->answer = [];
-            else
-                $questions[$key]->answer = null;
+        foreach ($Trails as $key => $trail) {
+
+            // $question = $trail->Question;
+
+            if (in_array($trail->trail_count, $trail_list)) {
+                $index = array_search($trail->trail_count, $trail_list);
+                if ($trail->is_correct_choice) {
+                    $trail_result[$index]["result"] += 1;
+                }
+                $trail_result[$index]["total"] += 1;
+            } else {
+                $result = 0;
+                if ($trail->is_correct_choice) {
+                    $result = 1;
+                }
+                $date = $trail->updated_at->format('Y-m-d    H:i:s');
+                array_push($trail_result, [
+                    "date" => $date,
+                    "result" => $result,
+                    "total" => 1,
+                    "quiz" => $trail->quiz_id,
+                    "trail" => $trail->trail_count
+                ]);
+                array_push($trail_list, $trail->trail_count);
+            }
         }
-        return Response()->json(["success_message" => true, "data" => $questions]);
+
+        // $trail_result["total"] = $questions->count();
+        foreach ($questions as $key => $question) {
+
+            $question->Answers;
+            $answers = $question->ResultsSubmitted->where('trail_completed', false);
+            if ($question->question_type == 3) {
+                $results = [];
+                foreach ($answers as $akey => $answer) {
+                    array_push($results, $answer->chosen_answer);
+                }
+                $questions[$key]->answer = $results;
+            } else
+                $questions[$key]->answer = $answers == null || $answers->count() <= 0 ? null : $answers[0]->chosen_answer;
+        }
+        return Response()->json(["success_message" => true, "data" => [$questions, $trail_result]]);
     }
 
 
@@ -275,6 +314,25 @@ class QuizController extends Controller
     }
 
 
+    public function OpenQuizReport(Request $request, $quiz_id, $trail_count)
+    {
+        $user = $request->user();
+        abort_if(!$user->is_student, 403);
+
+        $quiz = QuizesModel::where('id', $quiz_id)->get();
+        abort_if($quiz == null || $quiz->count() <= 0, 404, 'Could not find the quiz for this trail');
+
+        $trail = QuestionResultsModel::where([
+            ['trail_count', $trail_count],
+            ['quiz_id', $quiz_id],
+            // ['student_id', $user->id]
+        ])->get();
+
+        abort_if($trail == null || $trail->count() <= 0, 404, 'Could not find the trail report of the quiz');
+
+        return view('student.quiz_report', compact('user', 'quiz', 'trail'));
+    }
+
 
     // api
 
@@ -293,8 +351,11 @@ class QuizController extends Controller
             "question_type" => "nullable|integer|in:2"
         ];
 
-
-        $data = $request->validate($rules);
+        $validated = Validator::make($request->all(), $rules);
+        if ($validated->fails()) {
+            return $this->ResponseError($validated->errors()->first());
+        }
+        $data = $validated->validated();
         $question = QuestionsModel::where('id', $request->question_id)->get()[0];
         if ($question->is_deleted)
             return $this->ResponseError('The particular queston does not exist or has been deleted ');
@@ -334,8 +395,18 @@ class QuizController extends Controller
         if (is_array($data["answer"])) {
             foreach ($data["answer"] as $key => $answer) {
                 $AnswerResultModel->question_three_progress = $question->question_type == 3 && $key > 0;
+                $is_correct = AnswersModel::where('id', $answer)->get();
+                if ($is_correct == null || $is_correct->count() <= 0) {
+                    foreach ($results as $key => $result) {
+                        $result->delete();
+                    }
+
+                    return $this->ResponseError(
+                        'Could not verify whether your answer is correct or not. Please contact support',
+                    );
+                }
                 // array_push($results, $AnswerResultModel->question_three_progress);
-                $new_result = $AnswerResultModel->AnswerQuestion($question, $answer, $user->id);
+                $new_result = $AnswerResultModel->AnswerQuestion($question, $answer, $user->id, $is_correct[0]->is_correct);
                 if (!$new_result) {
                     foreach ($results as $key => $result) {
                         $result->delete();
@@ -349,7 +420,25 @@ class QuizController extends Controller
                 array_push($results, $new_result);
             }
         } else {
-            $new_result = $AnswerResultModel->AnswerQuestion($question, $data['answer'], $user->id);
+            if ($question->question_type == 1)
+                $is_correct = AnswersModel::where('question_id', $question->id)->get();
+            else
+                $is_correct = AnswersModel::where('id', $data["answer"])->get();
+            if ($is_correct == null || $is_correct->count() <= 0) {
+                foreach ($results as $key => $result) {
+                    $result->delete();
+                }
+
+                return $this->ResponseError(
+                    'Could not verify whether your answer is correct or not. Please contact support.',
+                );
+            } else {
+                if ($question->question_type == 1)
+                    $is_correct = $is_correct[0]->answer_bool == $data["answer"];
+                else
+                    $is_correct = $is_correct[0]->is_correct;
+            }
+            $new_result = $AnswerResultModel->AnswerQuestion($question, $data['answer'], $user->id, $is_correct);
             if (!$new_result) {
                 return $this->ResponseError(
                     'Failed to save the new answer to your question',
@@ -359,6 +448,107 @@ class QuizController extends Controller
         }
 
         return $this->ResponseSuccess($results, 'successully saved the answer');
+    }
+    public function SubmitQuiz(Request $request)
+    {
+        $user = $request->user();
+        if (!$user->is_student)
+            return $this->ResponseError("Permission denied. ");
+
+        $rules = [
+            "assignment_id" => "required|integer|exists:quizes,id"
+        ];
+        $validated = Validator::make($request->all(), $rules);
+        if ($validated->fails()) {
+            return $this->ResponseError($validated->errors()->first());
+        }
+        $data = $validated->validated();
+
+        $Assignemnt = QuizesModel::where('id', $data["assignment_id"])->get();
+        if ($Assignemnt == null || $Assignemnt->count() <= 0) {
+            return $this->ResponseError('The assignment could not be found');
+        }
+
+        $Questions = $Assignemnt[0]->Questions;
+        if ($Questions == null || $Questions->count() <= 0) {
+            return $this->ResponseError('Could not get the list of question for the given assignment. Contact support');
+        }
+        $completed = [];
+        foreach ($Questions as $key => $question) {
+            $trails = QuestionResultsModel::where([
+                ['question_id', $question->id],
+                ['trail_completed', false]
+            ])->get();
+            if ($trails == null || $trails->count() <= 0) {
+                foreach ($completed as $key => $trail) {
+                    //found incomplete /missing questions answer, reset the trail count and the completed status
+                    $trail->update(["trail_completed" => false, 'trail_count' => $trail->trail_count - 1]);
+                }
+                return $this->ResponseError(
+                    'Missing question(s), please ensure that you have answered all the questions and saved before submitting the assignment'
+                );
+            } else {
+                foreach ($trails as $key => $trail) {
+                    $trail->update(['trail_completed' => true, 'trail_count' => ($trail->trail_count + 1)]);
+                    array_push($completed, $trail);
+                }
+            }
+        }
+        return $this->ResponseSuccess([]);
+    }
+
+    public function GetDiagnosticQuizQuestions(Request $request)
+    {
+        $user = $request->user();
+        if (!$user->is_student)
+            return $this->ResponseError("Permission denied. ");
+
+
+        $quiz = QuizesModel::where('id', $request->quiz)->get()[0];
+        if ($quiz == null || $quiz->count() <= 0)
+            return $this->ResponseError('The selected diagnostic quiz could not be verified');
+        $Trails = $quiz->Trials;
+        if ($Trails != null)
+            $Trails = $Trails->where('trail_completed', true);
+        $trail_list = [];
+        // $trail_result = new Collection();
+        $trail_result = [];
+        $questions = $quiz->Questions;
+        if ($Trails != null)
+            foreach ($Trails as $key => $trail) {
+
+                // $question = $trail->Question;
+
+                if (in_array($trail->trail_count, $trail_list)) {
+                    $index = array_search($trail->trail_count, $trail_list);
+                    if ($trail->is_correct_choice) {
+                        $trail_result[$index]["result"] += 1;
+                    }
+                    $trail_result[$index]["total"] += 1;
+                } else {
+                    $result = 0;
+                    if ($trail->is_correct_choice) {
+                        $result = 1;
+                    }
+                    $date = $trail->updated_at->format('Y-m-d    H:i:s');
+                    array_push($trail_result, ["date" => $date, "result" => $result, "total" => 1]);
+                    array_push($trail_list, $trail->trail_count);
+                }
+            }
+        foreach ($questions as $key => $question) {
+
+            $question->Answers;
+            $answers = $question->ResultsSubmitted->where('trail_completed', false);
+            if ($question->question_type == 3) {
+                $results = [];
+                foreach ($answers as $akey => $answer) {
+                    array_push($results, $answer->chosen_answer);
+                }
+                $questions[$key]->answer = $results;
+            } else
+                $questions[$key]->answer = $answers == null || $answers->count() <= 0 ? null : $answers[0]->chosen_answer;
+        }
+        return $this->ResponseSuccess([$questions, $trail_list]);
     }
 
     public function ResponseError($error, $error_description = null)

@@ -111,7 +111,7 @@
         </div>
         @if ($courses->count() <=0 )
         <div class="alert alert-warning">
-            <i class="fa fa-info-circle fa-2x mr-2"></i>There are courses in this category
+            <i class="fa fa-info-circle fa-2x mr-2"></i>There are no courses in this category
         </div>
         @endif
 

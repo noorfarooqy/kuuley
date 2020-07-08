@@ -68,7 +68,7 @@
                             <div class="flex" style="min-width: 200px;">
                                 <div class="d-flex">
                                     <div>
-                                        <h4 class="card-title mb-1"><a href="/admin/courses/{{$course->id}}">
+                                        <h4 class="card-title mb-1"><a href="/student/courses/{{$course->id}}/lessons/list">
                                             {{$course->course_name}}</a></h4>
                                         <p class="text-muted">{{$course->course_description}}</p>
                                     </div>
@@ -109,7 +109,7 @@
         </div>
         @if ($EnrolledCourses->count() <=0 )
         <div class="alert alert-warning">
-            <i class="fa fa-info-circle fa-2x mr-2"></i>There are courses in this category
+            <i class="fa fa-info-circle fa-2x mr-2"></i>There are no courses in this category
         </div>
         @endif
 

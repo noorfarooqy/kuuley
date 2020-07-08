@@ -386,7 +386,14 @@
                                             <small class="text-muted text-uppercase">
 
                                                 <strong>{{Auth::user()->name}}</strong>
-                                                {{Auth::user()->is_student ? "Student" : Auth::user()->isAdmin ? "Admin": "Instructor"}}
+                                                @if (Auth::user()->is_student && Auth::user()->isAdmin == null)
+                                                    Student
+                                                @elseif(Auth::user()->HasInstructorInfo() )
+                                                    Instructor
+                                                @else
+                                                    Adminstrator
+                                                @endif
+                                                {{-- {{Auth::user()->is_student == true ? "Student" : Auth::user()->isAdmin ? "Admin": "Instructor"}} --}}
                                             </small>
                                         </span>
                                     </a>

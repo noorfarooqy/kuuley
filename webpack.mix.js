@@ -16,4 +16,6 @@ mix.js('resources/js/app.js', 'public/js')
     .js('resources/js/courses/lesson.js', 'public/js')
     .js('resources/js/courses/courses_list.js', 'public/js')
     .js('resources/js/courses/course_info.js', 'public/js')
+    .js('resources/js/students/student_diag.js', 'public/js')
+    .js('resources/js/quizes/quiz_report.js', 'public/js')
     .sass('resources/sass/app.scss', 'public/css');

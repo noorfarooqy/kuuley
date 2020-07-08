@@ -78,6 +78,7 @@
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                             <a class="dropdown-item" href="/admin/student/{{$student->id}}" target="_blank">View profile</a>
                                             <a class="dropdown-item" href="/admin/student/{{$student->id}}/enrolls" target="_blank">Enrollments</a>
+                                            <a class="dropdown-item" href="/admin/student/{{$student->id}}/quizes" target="_blank">Diagnostic Quiz</a>
                                           </div>
                                         <form action="{{route('make-user-admin')}}" method="POST" id="make-admin-form">
                                             @csrf

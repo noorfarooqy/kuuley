@@ -4,10 +4,15 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\models\courses\CourseEnrollsModel;
+use App\models\courses\CoursesModel;
+use App\models\courses\LessonsModel;
 use App\models\instructors\InstructorModel;
 use App\models\misc\CountryModel;
 use App\models\misc\PasswordResetModel;
+use App\models\quiz\QuizesModel;
+use App\models\students\StudentDiagnosticsModel;
 use App\Notifications\admin\NewAdminNotification;
+use App\Notifications\students\AssignedDiagnosticQuestionNotification;
 use App\Notifications\students\RequestToEnrollCourseApproved;
 use App\Notifications\students\RequestToEnrollCourseRejected;
 use App\Notifications\teachers\NewTeacherNotification;
@@ -200,9 +205,10 @@ class AdminController extends Controller
             abort(404);
         }
 
-        $user = $user[0];
+        $student = $user[0];
+        $StudentInfo = $student->studentInfo;
         $countries = CountryModel::all();
-        return view('student.student_info', compact('user', 'countries'));
+        return view('student.student_info', compact('student', 'StudentInfo', 'countries'));
     }
 
     public function ViewCoursesPage(Request $request)
@@ -228,6 +234,42 @@ class AdminController extends Controller
         $Enrollments = CourseEnrollsModel::where('student_id', $user_id)->with('courseInfo')->get();
 
         return view('student.student_enrolls', compact('Enrollments', 'student'));
+    }
+
+    public function AssignDiagnostic(Request $request, $user_id)
+    {
+        $admin = $request->user()->isAdmin;
+        abort_if($admin->student_permission < $admin->perm_read, 403);
+        $student = User::where('id', $user_id)->get();
+        if ($student->count() <= 0) {
+            abort(404);
+        }
+        $rules = [
+            "course" => "required|integer|exists:courses,id",
+            "diagnostic" => "required|integer|exists:quizes,id",
+            "lesson" => "nullable|integer"
+        ];
+        $data = $request->validate($rules);
+        $course = CoursesModel::where('id', $request->course)->get();
+        abort_if($course == null || $course->count() <= 0, 404);
+        if (isset($data["lesson"]) && $request->lesson != "-1") {
+            $lesson = LessonsModel::where('id', $request->lesson)->get();
+            abort_if($lesson == null || $lesson->count() <= 0, 404);
+        } else {
+            $data["lesson"] = null;
+        }
+        $diagnostic = QuizesModel::where('id', $data["diagnostic"])->get();
+        abort_if($diagnostic == null || $diagnostic->count() <= 0, 404);
+
+        $DiagnosticModel = new StudentDiagnosticsModel();
+
+        $new_diag = $DiagnosticModel->AssignDiagnostic($data, $student[0]->id, $admin->user_id);
+
+        if (!$new_diag) {
+            return Redirect::back()->withErrors(['error' => $DiagnosticModel->getError()]);
+        }
+        $student[0]->notify(new AssignedDiagnosticQuestionNotification($student[0]->studentInfo));
+        return Redirect::back()->with('success', 'successfully assigned student to diagnostic');
     }
 
     public function ApproveCourseEnroll(Request $request, $user_id, $enroll_id)
@@ -286,5 +328,21 @@ class AdminController extends Controller
         if ($Enrollments == null || $Enrollments->count() <= 0) return 404;
 
         return [$Enrollments, $student];
+    }
+
+    public function OpenQuizesList(Request $request, $user_id)
+    {
+        $admin = $request->user()->isAdmin;
+        abort_if($admin->student_permission < $admin->perm_read, 403);
+
+        $student = User::where('id', $user_id)->get();
+        if ($student->count() <= 0) {
+            abort(404);
+        }
+
+        $quizes = $student[0]->Diagnostics;
+        $Courses = CoursesModel::get();
+        $Diagnostics = QuizesModel::where('is_diagnostic', true)->get();
+        return view('quiz.student_quiz', compact('quizes', 'Diagnostics', 'Courses'));
     }
 }

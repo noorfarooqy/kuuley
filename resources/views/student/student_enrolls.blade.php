@@ -54,7 +54,6 @@
     
                                     <th>Status</th>
                                     <th style="width: 120px;">Email</th>
-                                    <th style="width: 120px;">Phone</th>
                                     <th style="width: 24px;"></th>
                                 </tr>
                             </thead>
@@ -91,7 +90,7 @@
     
     
                                     <td><small class="text-muted">{{$student->email}}</small></td>
-                                    <td class="dropdown">
+                                    {{-- <td class="dropdown">
                                         <div href="#"  class="text-muted" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             <i class="material-icons">more_vert</i>
                                         </div>
@@ -108,7 +107,7 @@
                                             @csrf
                                             <input type="hidden" value="{{$student->id}}" name="user_id">
                                         </form>
-                                    </td>
+                                    </td> --}}
                                 </tr>
                                 
                                 @endforeach

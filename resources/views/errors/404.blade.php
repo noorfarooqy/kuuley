@@ -11,4 +11,9 @@
 @section('error-text')
     The resource you are trying to access could not be found.
     If this is a mistake you are seeing, please contact support for assistance.
+    <br>
+
+    <div class="alert alert-info">
+        {{ $exception->getMessage() }}
+    </div>
 @endsection

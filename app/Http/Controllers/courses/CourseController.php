@@ -14,6 +14,7 @@ use Facade\FlareClient\Http\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class CourseController extends Controller
 {
@@ -189,8 +190,11 @@ class CourseController extends Controller
             return $this->ResponseError("The course does not exists.");
 
         if ($user->is_student) {
-            $enroll_info = User::whereHas('enrolledCourses', function ($query) use ($course) {
-                $query->where('course_id', $course[0]->id);
+            $enroll_info = $user->whereHas('enrolledCourses', function ($query) use ($course, $user) {
+                $query->where([
+                    ['course_id', $course[0]->id],
+                    ['student_id', $user->id]
+                ]);
             })->get();
             $course[0]->enroll_info = $enroll_info;
             $course[0]->course_progress = 0; //TODO: course progress
@@ -249,6 +253,33 @@ class CourseController extends Controller
         }
 
         return $this->ResponseSuccess($course[0]);
+    }
+
+    public function GetCourseLessons(Request $request)
+    {
+        $user = $request->user();
+        if (!$user->is_student) {
+            return $this->ResponseError('Permission denied');
+        }
+
+        $rules = [
+            "course_id" => "required|integer|exists:courses,id"
+        ];
+
+        $validated = Validator::make($request->all(), $rules);
+        if ($validated->fails()) {
+            return $this->ResponseError($validated->errors()->first());
+        }
+
+        $course = CoursesModel::where('id', $request->course_id)->get();
+
+        if ($course == null || $course->count() <= 0) {
+            return $this->ResponseError('could not verify the course selected');
+        }
+
+        $lessons = $course[0]->lessons->where('lesson_type', '<=', 20);
+
+        return $this->ResponseSuccess($lessons);
     }
 
 

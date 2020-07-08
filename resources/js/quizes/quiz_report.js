@@ -3,20 +3,15 @@ import maths from '../components/maths.vue';
 import VueMathjax from 'vue-mathjax'
 import QuizInfo from "./../components/quiz_info.vue";
 import Server from "./../server";
+import Chart from 'chart.js'
+// import ionRangeSlider from 'ion-rangeslider';
 Vue.use(VueMathjax)
     // Vue.use('')
 var app = new Vue({
     el: "#app",
     data: {
         p1: null,
-        Quizerrors: [],
         Server: new Server(),
-        Questions: [],
-        Answer: {
-            question_id: null,
-            answer: null,
-        },
-        SubmittedResults: [],
 
     },
     methods: {
@@ -25,37 +20,9 @@ var app = new Vue({
         }
     },
     mounted() {
-        if (window.quiz_id != undefined && window.quiz_id != null) {
-            this.Server.setRequest({
-                api_token: window.api_token,
-                quiz_id: window.quiz_id
-            });
-            this.Server.serverRequest('/api/admin/quiz/questions', this.ShowQuizQuestions, this.showErrors);
-        } else if (window.lesson_id != undefined && window.lesson_id != null) {
-            this.ToggleLoader(true);
-            this.Server.setRequest({
-                api_token: window.api_token,
-                lesson_id: window.lesson_id
-            });
-
-            this.Server.serverRequest('/api/student/quiz/questions', this.setQuizQuestions, this.showErrors);
-        }
 
     },
     methods: {
-        setQuizQuestions(data) {
-            this.Questions = data[0];
-            this.SubmittedResults = data[1];
-            this.ToggleLoader();
-        },
-
-        ShowQuizQuestions(data) {
-            console.log(data);
-            data.forEach(question => {
-                this.AddNewQuestion(question);
-            });
-            this.ToggleLoader();
-        },
         showErrors(error) {
             // alert(error);
             console.log('error ', error);

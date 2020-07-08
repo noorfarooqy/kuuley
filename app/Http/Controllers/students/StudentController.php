@@ -8,6 +8,7 @@ use App\models\courses\CourseEnrollsModel;
 use App\models\courses\CoursesModel;
 use App\models\courses\LessonsModel;
 use App\models\misc\CountryModel;
+use App\models\students\StudentDiagnosticsModel;
 use App\models\students\StudentInfoModel;
 use App\User;
 use Facade\FlareClient\Http\Response;
@@ -181,6 +182,16 @@ class StudentController extends Controller
         $sections = $course->lessonSections;
 
         return view('lessons.view_lessons', compact('course', 'sections', 'viewLesson'));
+    }
+
+    public function GetDiagnosticQuizes(Request $request)
+    {
+        $user = $request->user();
+        abort_if(!$user->is_student, 403);
+
+        $Diagnostics = StudentDiagnosticsModel::where('student_id', $user->id)->get();
+
+        return view('student.diagnostic_quiz', compact('Diagnostics'));
     }
 
 

@@ -57,76 +57,87 @@
                     $Questions = $viewLesson->Assignment->Questions;
                     @endphp
 
-        
-                    <div class="card mb-4" data-position="1" data-question-id="1" v-for="(question,qkey) in Questions">
-                        <div class="card-header d-flex justify-content-between">
-                            <div class="d-flex align-items-center ">
 
-                                <span class="question_handle btn btn-sm btn-secondary">
-                                    <i class="material-icons">menu</i>
-                                </span>
-                                <div class="h4 m-0 ml-4">
-                                    <vue-mathjax :formula="'$$' + question.question_text + '$$'"></vue-mathjax>
+                    <div class="card mb-4" data-position="1" data-question-id="1">
+                        <div v-for="(question,qkey) in Questions">
+                            <div class="card-header d-flex justify-content-between">
+                                <div class="d-flex align-items-center ">
+
+                                    <span class="question_handle btn btn-sm btn-secondary">
+                                        <i class="material-icons">menu</i>
+                                    </span>
+                                    <div class="h4 m-0 ml-4">
+                                        <vue-mathjax :formula="'$$' + question.question_text + '$$'"></vue-mathjax>
+                                    </div>
                                 </div>
                             </div>
+                            <div class="card-body">
+
+                                <div id="answerWrapper_1" class="mb-4" v-if="question.question_type == 1">
+
+                                    <ul class="list-group" id="answer_container_1">
+                                        <li class="list-group-item d-flex" data-position="1" data-answer-id="1"
+                                            data-question-id="1">
+                                            <span class="mr-2"><i class="material-icons text-light-gray">menu</i></span>
+                                            <div>
+                                                False
+                                            </div>
+                                            <div class="ml-auto">
+                                                <input type="radio" v-model="question.answer" 
+                                                    :name="'answer'+question.id" id="" class="form-control-input"
+                                                    :value="0" :checked="question.answer == 0">
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item d-flex" data-position="2" data-answer-id="2"
+                                            data-question-id="2">
+                                            <span class="mr-2"><i class="material-icons text-light-gray">menu</i></span>
+                                            <div>
+                                                True
+                                            </div>
+                                            <div class="ml-auto">
+                                                <input type="radio" :value="1" v-model="question.answer"
+                                                    :checked="question.answer == 1"
+                                                    :name="'answer'+question.id" id="" class="form-control-input">
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="answerWrapper_1" class="mb-4" v-else>
+
+                                    <ul class="list-group" id="answer_container_1">
+                                        <li class="list-group-item d-flex" data-position="1" data-answer-id="1"
+                                            data-question-id="1" v-for="(answer, akey) in question.answers" :key="akey">
+                                            <span class="mr-2"><i class="material-icons text-light-gray">menu</i></span>
+                                            <div>
+                                                <vue-mathjax :formula="'$$ '+answer.answer_text+' $$'"></vue-mathjax>
+                                            </div>
+                                            <div class="ml-auto">
+
+                                                <input type="radio" v-model="question.answer" :checked="question.answer == question.id"
+                                                    :name="'answer'+question.id" :id="question.id" class="form-control-input"
+                                                    v-if="question.question_type == 2" :value="answer.id" >
+
+                                                <input type="checkbox" :name="'answer'+question.id+'_'+akey"
+                                                    :value="answer.id" class="form-control-input" v-else
+                                                    v-model="question.answer" :checked="question.answer == question.id">
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="mt-3 mb-3 center">
+                                    <input type="submit" value="Save" class="btn btn-primary"
+                                        @click.prevent="submitAnswer(question)"> 
+                                </div>
+                                <div class="mb-3 center">
+                                    <span class="text-light-gray" v-if="question.answer != null">Saved</span>
+                                </div>
+
+                            </div>
                         </div>
-                        <div class="card-body">
-
-                            <div id="answerWrapper_1" class="mb-4" v-if="question.question_type == 1">
-
-                                <ul class="list-group" id="answer_container_1">
-                                    <li class="list-group-item d-flex" data-position="1" data-answer-id="1"
-                                        data-question-id="1">
-                                        <span class="mr-2"><i class="material-icons text-light-gray">menu</i></span>
-                                        <div>
-                                            False
-                                        </div>
-                                        <div class="ml-auto">
-                                            <input type="radio" v-model="question.answer" :name="'answer'+question.id" id="" 
-                                            class="form-control-input" :value="0">
-                                        </div>
-                                    </li>
-                                    <li class="list-group-item d-flex" data-position="2" data-answer-id="2"
-                                        data-question-id="2">
-                                        <span class="mr-2"><i class="material-icons text-light-gray">menu</i></span>
-                                        <div>
-                                            True
-                                        </div>
-                                        <div class="ml-auto">
-                                            <input type="radio" :value="1" v-model="question.answer" :name="'answer'+question.id" 
-                                            id="" class="form-control-input">
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div id="answerWrapper_1" class="mb-4" v-else>
-
-                                <ul class="list-group" id="answer_container_1">
-                                    <li class="list-group-item d-flex" data-position="1" data-answer-id="1"
-                                        data-question-id="1" v-for="(answer, akey) in question.answers" :key="akey">
-                                        <span class="mr-2"><i class="material-icons text-light-gray">menu</i></span>
-                                        <div >
-                                            <vue-mathjax :formula="'$$ '+answer.answer_text+' $$'"></vue-mathjax>
-                                        </div>
-                                        <div class="ml-auto">
-                                            
-                                            <input type="radio" v-model="question.answer" :name="'answer'+question.id" id="" class="form-control-input" 
-                                            v-if="question.question_type == 2" :value="answer.id">
-
-                                            <input type="checkbox" :name="'answer'+question.id+'_'+akey" :value="answer.id"
-                                             class="form-control-input" v-else v-model="question.answer" >
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <div class="mt-3 mb-3 center">
-                                <input type="submit" value="Save" class="btn btn-primary" @click.prevent="submitAnswer(question)">
-                            </div>
-
-                        </div>
+                        <div class="btn btn-primary" @click.prevent="submitQuiz({{$viewLesson->assignment_id}})">Submit Assignment</div>
                     </div>
-                    <div class="btn btn-primary" @click.prevent="submitQuiz">Submit Assignment</div>
+                    
 
                     @else
                     <div class="embed-responsive embed-responsive-16by9">
@@ -159,6 +170,26 @@
                     </div>
                     <div class="card-body">
                         {{$viewLesson->lessonDescription}}
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead class="thead">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Trial date</th>
+                                    <th>Result</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(result, rkey) in SubmittedResults">
+                                    <td v-text="rkey+1"></td>
+                                    <td >
+                                        <a :href="'/student/trail/'+result['quiz']+'/'+result['trail']" v-text="result['date']"></a>
+                                    </td>
+                                    <td v-text="((result['result']/result['total'])*100).toFixed(2) + '%'"></td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
                 @else
@@ -296,11 +327,10 @@
 
 @section('scripts')
 @if (isset($viewLesson) && $viewLesson != null)
-    
-<script>
 
-window.lesson_id = "{{$viewLesson->id}}";
-window.api_token = "{{Auth::user()->api_token}}";
+<script>
+    window.lesson_id = "{{$viewLesson->id}}";
+    window.api_token = "{{Auth::user()->api_token}}";
 
 </script>
 @endif

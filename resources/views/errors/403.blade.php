@@ -11,4 +11,10 @@
 @section('error-text')
     You do not have access to this resource.
     If this is a mistake you are seeing, please contact support for assistance.
+
+    <br>
+
+    <div class="alert alert-info">
+        {{ $exception->getMessage() }}
+    </div>
 @endsection

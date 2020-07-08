@@ -40,6 +40,8 @@ Route::middleware(['auth'])->group(function () {
                 Route::get('/list', 'admin\AdminController@ViewStudentsList');
                 Route::get('/{student_id}', 'admin\AdminController@ViewStudentInfo');
                 Route::get('/{student_id}/enrolls', 'admin\AdminController@ViewStudentEnrolls');
+                Route::get('/{student_id}/quizes', 'admin\AdminController@OpenQuizesList');
+                Route::post('/{student_id}/quizes', 'admin\AdminController@AssignDiagnostic');
                 Route::get('/{student_id}/enrolls/{enroll_id}/approve', 'admin\AdminController@ApproveCourseEnroll');
                 Route::get('/{student_id}/enrolls/{enroll_id}/reject', 'admin\AdminController@RejectCourseEnroll');
             });
@@ -81,6 +83,8 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/courses', 'students\StudentController@GetCoursesList');
             Route::get('/courses/{course_id}', 'students\StudentController@GetCourseInfoPage');
             Route::get('/courses/{course_id}/lessons/{lesson_id}', 'students\StudentController@GetLessonEnrolled');
+            Route::get('/quiz', 'students\StudentController@GetDiagnosticQuizes');
+            Route::get('/trail/{quiz_id}/{trail_id}', 'quiz\QuizController@OpenQuizReport');
         });
     });
 });
