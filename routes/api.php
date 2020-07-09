@@ -33,6 +33,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/quiz/answer', 'quiz\QuizController@AnswerQuestion');
         Route::post('/quiz/submit', 'quiz\QuizController@SubmitQuiz');
         Route::post('/quiz/diag', 'quiz\QuizController@GetDiagnosticQuizQuestions');
+        Route::post('/quiz/report', 'quiz\QuizController@GetQuizReport');
     });
     Route::prefix('/courses')->group(function () {
         Route::post('/lessons', 'courses\CourseController@GetCourseLessons');

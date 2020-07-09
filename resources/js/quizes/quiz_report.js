@@ -4,6 +4,7 @@ import VueMathjax from 'vue-mathjax'
 import QuizInfo from "./../components/quiz_info.vue";
 import Server from "./../server";
 import Chart from 'chart.js'
+import ResultProjection from '../components/resultprojectchart.vue';
 // import ionRangeSlider from 'ion-rangeslider';
 Vue.use(VueMathjax)
     // Vue.use('')
@@ -11,7 +12,11 @@ var app = new Vue({
     el: "#app",
     data: {
         p1: null,
+        Quizerrors: [],
         Server: new Server(),
+        Questions: [],
+        Trails: [],
+        Results: null,
 
     },
     methods: {
@@ -21,8 +26,29 @@ var app = new Vue({
     },
     mounted() {
 
+        if (window.quiz != null && window.quiz != undefined) {
+            this.ToggleLoader(true);
+            this.Server.setRequest({
+                api_token: window.api_token,
+                quiz: window.quiz,
+                trail_count: window.trail,
+            });
+            this.Server.serverRequest(
+                '/api/student/quiz/report',
+                this.SetQuizReport,
+                this.showErrors
+            );
+        }
+
     },
     methods: {
+        SetQuizReport(data) {
+            console.log('data ', data);
+            this.Questions = data[0];
+            this.Trails = data[1];
+            this.Results = data[2][0];
+            this.ToggleLoader();
+        },
         showErrors(error) {
             // alert(error);
             console.log('error ', error);
@@ -45,59 +71,6 @@ var app = new Vue({
                 toggle = 'block';
             $(loader).css('display', toggle);
         },
-        DeletedQuestion(question) {
-            var ques = this.Questions.find(q => q.id == question.id);
-            var index = this.Questions.indexOf(ques);
-            if (index < 0) {
-                alert('Question deleted successfully, could not remove from the list. Refresh the page');
-            } else {
-                console.log('index to remove ', index);
-                this.Questions.splice(index, 1);
-                alert('succesfully deleted the question');
-            }
-
-        },
-        AddNewQuestion(question) {
-            this.Questions.push(question);
-        },
-        DeleteQuestion(question_id, quiz_id) {
-            this.Server.setRequest({
-                api_token: window.api_token,
-                question: question_id,
-                quiz_id: quiz_id,
-            });
-            this.Server.serverRequest('/api/admin/quiz/questions/delete', this.DeletedQuestion, this.showErrors);
-
-        },
-        submitAnswer(question) {
-
-            if (question.answer == null) {
-                this.showErrors('Please ensure you have selected an answer before saving');
-                return;
-            }
-            this.ToggleLoader(true);
-            this.Server.setRequest({
-                api_token: window.api_token,
-                question_id: question.id,
-                answer: question.answer
-            });
-            this.Server.serverRequest('/api/student/quiz/answer', this.answerSaved, this.showErrors);
-
-        },
-        submitQuiz(quiz_id) {
-            this.ToggleLoader(true);
-            this.Server.setRequest({
-                assignment_id: quiz_id,
-                api_token: window.api_token
-            });
-            this.Server.serverRequest('/api/student/quiz/submit', this.quizSubmitted, this.showErrors);
-        },
-        quizSubmitted(data) {
-            this.showSuccess('Assignment successfully submitted');
-        },
-        answerSaved(data) {
-            this.showSuccess('successfully saved the answer');
-        },
         showSuccess(message) {
             // alert(error);
             console.log('error ', message);
@@ -111,9 +84,48 @@ var app = new Vue({
             }, 10000);
             this.ToggleLoader();
         },
+        GetEstimatedGrade() {
+            var grade = ((this.Results['result'] / this.Results['total']) * 100).toFixed(1);
+            if (grade >= 90) return 'A';
+            else if (grade >= 80) return 'B';
+            else if (grade >= 70) return 'C';
+            else if (grade >= 60) return 'D';
+            else return 'E';
+        },
+        HasGotQuestionCorrect(question) {
+            var index = this.Trails.findIndex((trail) => trail.question_id == question.id);
+            return this.Trails[index].is_correct_choice;
+        },
+        IsCorrectChoice(answer, question) {
+            if (question.question_type === 1) {
+                var index = this.Trails.findIndex((trail) => trail.question_id == question.id && trail.chosen_answer == answer);
+                console.log('comparing ', answer, ' and ', this.Trails[0].chosen_answer);
+            } else
+                var index = this.Trails.findIndex((trail) => trail.question_id == question.id && trail.chosen_answer == answer.id);
+
+            if (index >= 0) {
+
+                return this.Trails[index].is_correct_choice;
+            }
+            return false;
+        },
+        IsChosenAnswer(answer, question) {
+            if (question.question_type === 1) {
+                var index = this.Trails.findIndex((trail) => trail.question_id == question.id && trail.chosen_answer == answer);
+                console.log('comparing ', answer, ' and ', this.Trails[0].chosen_answer);
+            } else
+                var index = this.Trails.findIndex((trail) => trail.question_id == question.id && trail.chosen_answer == answer.id);
+            if (index >= 0) {
+                return true;
+            }
+            return false;
+        }
+
+
     },
     components: {
         'math-comp': maths,
-        'quiz-info': QuizInfo
+        'quiz-info': QuizInfo,
+        'result-chart': ResultProjection
     },
 })

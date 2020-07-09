@@ -23,7 +23,7 @@
 
 
 
-    <div class="container-fluid page__container">
+    <div class="container-fluid page__container" v-if="Results != null && Questions.length > 0 && Trails.length > 0">
 
         <div class="row">
             <div class="col">
@@ -31,7 +31,7 @@
                     <div class="card-body">
                         <i class="fa fa-pen-alt mr-2"></i>Attempted
                         <h3>
-                            30
+                            @{{Questions.length}}
                         </h3>
                         Questions
                     </div>
@@ -42,7 +42,7 @@
                     <div class="card-body">
                         <i class="fa fa-file-alt mr-2"></i>Test
                         <h3>
-                            30
+                            @{{((Results['result']/Results['total'])*100).toFixed(1) + '%'}}
                         </h3>
                         Score
                     </div>
@@ -53,7 +53,7 @@
                     <div class="card-body">
                         <i class="fa fa-graduation-cap mr-2"></i>Estimated
                         <h3>
-                            A
+                            @{{GetEstimatedGrade()}}
                         </h3>
                         Grade
                     </div>
@@ -64,7 +64,7 @@
                     <div class="card-body">
                         <i class="fa fa-clock mr-2"></i>Time
                         <h3>
-                            30
+                            @{{Results['time']}}
                         </h3>
                         Taken
                     </div>
@@ -81,9 +81,7 @@
                     <div class="card-body">
                         <p> </p>
 
-                        <div class="chart">
-                            <canvas id="devicesChart" class="chart-canvas"></canvas>
-                        </div>
+                        <result-chart :results="Results"></result-chart>
                     </div>
                 </div>
             </div>
@@ -98,19 +96,24 @@
                         <div class="chart">
 
                             <div class=" card-form__body card-body border-left">
-                                <label for="">Correct questions</label>
+                                <label for="">Correct questions (@{{Results.result}})</label>
                                 <div class="progress">
-                                    <div class="progress-bar bg-success" role="progressbar" style="width: 25%;"
-                                        aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+                                    <div class="progress-bar bg-success" role="progressbar"
+                                        :style="'width: '+((Results.result/Results.total)*100).toFixed(0)+'%'"
+                                        aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+                                        @{{((Results['result']/Results['total'])*100).toFixed(0)}}%
+                                    </div>
                                 </div>
 
                             </div>
                             <div class=" card-form__body card-body border-left">
-                                <label for="">Correct questions</label>
+                                <label for="">Correct questions (@{{Results.total - Results.result}})</label>
                                 <div class="progress">
                                     <div class="progress-bar" role="progressbar"
-                                        style="width: 25%; background-color:#e40808 !important" aria-valuenow="25"
-                                        aria-valuemin="0" aria-valuemax="100">25%</div>
+                                        :style="'width: '+(((Results.total - Results.result)/Results.total)*100).toFixed(0)+'%; background-color:#e40808 !important'"
+                                        aria-valuemin="0" aria-valuemax="100">
+                                        @{{(((Results.total - Results.result)/Results['total'])*100).toFixed(0)}}%
+                                    </div>
                                 </div>
 
                             </div>
@@ -199,31 +202,108 @@
                         Questions review
                     </div>
                     <div class="card-body">
-                        <ul class="pagination">
-                            <li class="page-item">
-                                <a class="page-link  bg-soft-success rounded-circle" href="#" tabindex="-1">1</a>
-                            </li>
-                            <span class="mt-1 ml-3 w-75">
-                                The question for this topic
-                            </span>
-                            <span class="mt-1">
-                                <i class="fa fa-check-circle text-success fa-2x"></i>
-                            </span>
-                            
-                        </ul>
-                        <ul class="pagination">
-                            <li class="page-item">
-                                <a class="page-link  bg-soft-danger rounded-circle" href="#" tabindex="-1">2</a>
-                            </li>
-                            <span class="mt-1 ml-3 w-75">
-                                The question for this topic
-                            </span>
-                            <span class="mt-1">
-                                <i class="fa fa-times-circle text-danger fa-2x"></i>
-                            </span>
-                            
-                        </ul>
-                        
+                        <div v-for="(question,qkey) in Questions">
+                            <div class="card-header d-flex justify-content-between">
+                                <div class="row w-100">
+                                    <div class="col-md-8 col-lg-8 ">
+                                        <div class="d-flex align-items-center">
+                                            <ul class="pagination">
+                                                <li class="page-item">
+                                                    <a class="page-link bg-soft-success rounded-circle" href="#"
+                                                        tabindex="-1" v-if="HasGotQuestionCorrect(question)">
+                                                        @{{qkey+1}}
+                                                    </a>
+
+                                                    <a class="page-link bg-soft-danger rounded-circle" href="#"
+                                                        tabindex="-1" v-else>
+                                                        @{{qkey+1}}
+                                                    </a>
+
+                                                </li>
+
+                                            </ul>
+                                            <div class="h4 m-0 ml-4">
+                                                <vue-mathjax :formula="'$$' + question.question_text + '$$'">
+                                                </vue-mathjax>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4 col-lg-4 mr-0">
+                                        <i class="fa fa-check-circle text-success fa-2x" style="float: right"
+                                         v-if="HasGotQuestionCorrect(question)"></i>
+                                        <i class="fa fa-times-circle text-danger fa-2x" style="float: right" v-else></i>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="card-body">
+
+                                <div id="answerWrapper_1" class="mb-4" v-if="question.question_type == 1">
+
+                                    <ul class="list-group" id="answer_container_1">
+                                        <li class="list-group-item d-flex" data-position="1" data-answer-id="1"
+                                            data-question-id="1">
+                                            <span class="mr-2"><i class="material-icons text-light-gray">menu</i></span>
+                                            <div>
+                                                False
+                                            </div>
+                                            <div class="ml-auto">
+                                                
+                                                <i class="fa fa-thumbs-up text-success" 
+                                                v-if="IsChosenAnswer(0, question) && 
+                                                IsCorrectChoice(0, question)"></i>
+                                                <i class="fa fa-thumbs-down text-danger" 
+                                                v-else-if="IsChosenAnswer(0, question)"></i>
+                                                <i class="fa fa-check-circle text-success" 
+                                                v-if="question.answers[0].answer_bool == 0"></i>
+
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item d-flex" data-position="2" data-answer-id="2"
+                                            data-question-id="2">
+                                            <span class="mr-2"><i class="material-icons text-light-gray">menu</i></span>
+                                            <div>
+                                                True
+                                            </div>
+                                            <div class="ml-auto">
+                                                <i class="fa fa-thumbs-up text-success" 
+                                                v-if="IsChosenAnswer(1, question) && 
+                                                IsCorrectChoice(1, question)"></i>
+                                                <i class="fa fa-thumbs-down text-danger" 
+                                                v-else-if="IsChosenAnswer(1, question)"></i>
+                                                <i class="fa fa-check-circle text-success" 
+                                                v-if="question.answers[0].answer_bool == 1"></i>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="answerWrapper_1" class="mb-4" v-else>
+
+                                    <ul class="list-group" id="answer_container_1">
+                                        <li class="list-group-item d-flex" data-position="1" data-answer-id="1"
+                                            data-question-id="1" v-for="(answer, akey) in question.answers" :key="akey">
+                                            <span class="mr-2"><i class="material-icons text-light-gray">menu</i></span>
+                                            <div>
+                                                <vue-mathjax :formula="'$$ '+answer.answer_text+' $$'"></vue-mathjax>
+                                            </div>
+                                            <div class="ml-auto">
+
+                                                <i class="fa fa-thumbs-up text-success" 
+                                                v-if="IsCorrectChoice(answer,question)"></i>
+                                                <i class="fa fa-thumbs-down text-danger" 
+                                                v-else-if="IsChosenAnswer(answer,question)"></i>
+                                                <i class="fa fa-check-circle text-success" 
+                                                v-if="answer.is_correct"></i>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
@@ -239,40 +319,24 @@
 <script src="/assets/vendor/list.min.js"></script>
 <script src="/assets/js/list.js"></script> --}}
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_HTML"></script>
 @php
 $hash = hash('md5', file_get_contents(public_path('js/quiz_report.js')));
 @endphp
-<script src="{{'/js/quiz_report.js?'.$hash}}"></script>
 
 <script>
-    var ctx = document.getElementById('devicesChart').getContext('2d');
-    var myChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Correct Answers', 'Incorrect Answers', ],
-            datasets: [{
-                label: '# of Votes',
-                data: [12, 19],
-                backgroundColor: [
-                    'rgb(4, 158, 94)',
-                    'rgba(228, 0, 0, 0.97)',
-                ],
-                borderColor: [
-                    'rgb(4, 158, 94)',
-                    'rgba(228, 0, 0, 0.97)',
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {}
-    });
+    window.api_token = "{{Auth::user()->api_token}}";
+    window.quiz = "{{$quiz->id}}";
+    window.trail = "{{$trail[0]->trail_count}}";
 
 </script>
+
+<script src="{{'/js/quiz_report.js?'.$hash}}"></script>
+
+
 @endsection
 
 @section('links')
 <!-- ion Range Slider -->
-<link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.1/css/ion.rangeSlider.min.css" />
 
 @endsection

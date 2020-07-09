@@ -2280,6 +2280,57 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/resultprojectchart.vue?vue&type=script&lang=js&":
+/*!*****************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/resultprojectchart.vue?vue&type=script&lang=js& ***!
+  \*****************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      name: "result project chart",
+      version: 1
+    };
+  },
+  mounted: function mounted() {
+    this.SetUpQuizProjects();
+  },
+  methods: {
+    SetUpQuizProjects: function SetUpQuizProjects() {
+      console.log("canvas holder ", this.$refs.devicesChart); //   return;
+
+      var ctx = this.$refs.devicesChart.getContext("2d");
+      var myChart = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          labels: ["Correct Answers", "Incorrect Answers"],
+          datasets: [{
+            label: "# of Votes",
+            data: [this.results.result, this.results.total - this.results.result],
+            backgroundColor: ["rgb(4, 158, 94)", "rgba(228, 0, 0, 0.97)"],
+            borderColor: ["rgb(4, 158, 94)", "rgba(228, 0, 0, 0.97)"],
+            borderWidth: 1
+          }]
+        },
+        options: {}
+      });
+    }
+  },
+  props: ["results"]
+});
+
+/***/ }),
+
 /***/ "./node_modules/chart.js/dist/Chart.js":
 /*!*********************************************!*\
   !*** ./node_modules/chart.js/dist/Chart.js ***!
@@ -40879,6 +40930,36 @@ render._withStripped = true
 
 /***/ }),
 
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/resultprojectchart.vue?vue&type=template&id=4e5ff4e6&":
+/*!*********************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/resultprojectchart.vue?vue&type=template&id=4e5ff4e6& ***!
+  \*********************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "chart", attrs: { id: "CanvasChartDiv" } }, [
+    _c("canvas", {
+      ref: "devicesChart",
+      staticClass: "chart-canvas",
+      attrs: { id: "devicesChart" }
+    })
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js":
 /*!********************************************************************!*\
   !*** ./node_modules/vue-loader/lib/runtime/componentNormalizer.js ***!
@@ -53417,6 +53498,75 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/resultprojectchart.vue":
+/*!********************************************************!*\
+  !*** ./resources/js/components/resultprojectchart.vue ***!
+  \********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _resultprojectchart_vue_vue_type_template_id_4e5ff4e6___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./resultprojectchart.vue?vue&type=template&id=4e5ff4e6& */ "./resources/js/components/resultprojectchart.vue?vue&type=template&id=4e5ff4e6&");
+/* harmony import */ var _resultprojectchart_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./resultprojectchart.vue?vue&type=script&lang=js& */ "./resources/js/components/resultprojectchart.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _resultprojectchart_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _resultprojectchart_vue_vue_type_template_id_4e5ff4e6___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _resultprojectchart_vue_vue_type_template_id_4e5ff4e6___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/resultprojectchart.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/resultprojectchart.vue?vue&type=script&lang=js&":
+/*!*********************************************************************************!*\
+  !*** ./resources/js/components/resultprojectchart.vue?vue&type=script&lang=js& ***!
+  \*********************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_resultprojectchart_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib??ref--4-0!../../../node_modules/vue-loader/lib??vue-loader-options!./resultprojectchart.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/resultprojectchart.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_resultprojectchart_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/resultprojectchart.vue?vue&type=template&id=4e5ff4e6&":
+/*!***************************************************************************************!*\
+  !*** ./resources/js/components/resultprojectchart.vue?vue&type=template&id=4e5ff4e6& ***!
+  \***************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_resultprojectchart_vue_vue_type_template_id_4e5ff4e6___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./resultprojectchart.vue?vue&type=template&id=4e5ff4e6& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/resultprojectchart.vue?vue&type=template&id=4e5ff4e6&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_resultprojectchart_vue_vue_type_template_id_4e5ff4e6___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_resultprojectchart_vue_vue_type_template_id_4e5ff4e6___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
 /***/ "./resources/js/quizes/Answers.js":
 /*!****************************************!*\
   !*** ./resources/js/quizes/Answers.js ***!
@@ -53601,11 +53751,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _server__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./../server */ "./resources/js/server.js");
 /* harmony import */ var chart_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! chart.js */ "./node_modules/chart.js/dist/Chart.js");
 /* harmony import */ var chart_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(chart_js__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _components_resultprojectchart_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../components/resultprojectchart.vue */ "./resources/js/components/resultprojectchart.vue");
 var _Vue;
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 __webpack_require__(/*! ./../bootstrap */ "./resources/js/bootstrap.js");
+
 
 
 
@@ -53619,15 +53771,36 @@ var app = new Vue((_Vue = {
   el: "#app",
   data: {
     p1: null,
-    Server: new _server__WEBPACK_IMPORTED_MODULE_3__["default"]()
+    Quizerrors: [],
+    Server: new _server__WEBPACK_IMPORTED_MODULE_3__["default"](),
+    Questions: [],
+    Trails: [],
+    Results: null
   },
   methods: {
     somefunction: function somefunction() {
       console.log('hi');
     }
   },
-  mounted: function mounted() {}
+  mounted: function mounted() {
+    if (window.quiz != null && window.quiz != undefined) {
+      this.ToggleLoader(true);
+      this.Server.setRequest({
+        api_token: window.api_token,
+        quiz: window.quiz,
+        trail_count: window.trail
+      });
+      this.Server.serverRequest('/api/student/quiz/report', this.SetQuizReport, this.showErrors);
+    }
+  }
 }, _defineProperty(_Vue, "methods", {
+  SetQuizReport: function SetQuizReport(data) {
+    console.log('data ', data);
+    this.Questions = data[0];
+    this.Trails = data[1];
+    this.Results = data[2][0];
+    this.ToggleLoader();
+  },
   showErrors: function showErrors(error) {
     // alert(error);
     console.log('error ', error);
@@ -53647,59 +53820,6 @@ var app = new Vue((_Vue = {
     if (status == null || status == false) toggle = 'none';else toggle = 'block';
     $(loader).css('display', toggle);
   },
-  DeletedQuestion: function DeletedQuestion(question) {
-    var ques = this.Questions.find(function (q) {
-      return q.id == question.id;
-    });
-    var index = this.Questions.indexOf(ques);
-
-    if (index < 0) {
-      alert('Question deleted successfully, could not remove from the list. Refresh the page');
-    } else {
-      console.log('index to remove ', index);
-      this.Questions.splice(index, 1);
-      alert('succesfully deleted the question');
-    }
-  },
-  AddNewQuestion: function AddNewQuestion(question) {
-    this.Questions.push(question);
-  },
-  DeleteQuestion: function DeleteQuestion(question_id, quiz_id) {
-    this.Server.setRequest({
-      api_token: window.api_token,
-      question: question_id,
-      quiz_id: quiz_id
-    });
-    this.Server.serverRequest('/api/admin/quiz/questions/delete', this.DeletedQuestion, this.showErrors);
-  },
-  submitAnswer: function submitAnswer(question) {
-    if (question.answer == null) {
-      this.showErrors('Please ensure you have selected an answer before saving');
-      return;
-    }
-
-    this.ToggleLoader(true);
-    this.Server.setRequest({
-      api_token: window.api_token,
-      question_id: question.id,
-      answer: question.answer
-    });
-    this.Server.serverRequest('/api/student/quiz/answer', this.answerSaved, this.showErrors);
-  },
-  submitQuiz: function submitQuiz(quiz_id) {
-    this.ToggleLoader(true);
-    this.Server.setRequest({
-      assignment_id: quiz_id,
-      api_token: window.api_token
-    });
-    this.Server.serverRequest('/api/student/quiz/submit', this.quizSubmitted, this.showErrors);
-  },
-  quizSubmitted: function quizSubmitted(data) {
-    this.showSuccess('Assignment successfully submitted');
-  },
-  answerSaved: function answerSaved(data) {
-    this.showSuccess('successfully saved the answer');
-  },
   showSuccess: function showSuccess(message) {
     // alert(error);
     console.log('error ', message); // this.Errors.push(error);
@@ -53712,10 +53832,53 @@ var app = new Vue((_Vue = {
       $(alertor).css('display', 'none');
     }, 10000);
     this.ToggleLoader();
+  },
+  GetEstimatedGrade: function GetEstimatedGrade() {
+    var grade = (this.Results['result'] / this.Results['total'] * 100).toFixed(1);
+    if (grade >= 90) return 'A';else if (grade >= 80) return 'B';else if (grade >= 70) return 'C';else if (grade >= 60) return 'D';else return 'E';
+  },
+  HasGotQuestionCorrect: function HasGotQuestionCorrect(question) {
+    var index = this.Trails.findIndex(function (trail) {
+      return trail.question_id == question.id;
+    });
+    return this.Trails[index].is_correct_choice;
+  },
+  IsCorrectChoice: function IsCorrectChoice(answer, question) {
+    if (question.question_type === 1) {
+      var index = this.Trails.findIndex(function (trail) {
+        return trail.question_id == question.id && trail.chosen_answer == answer;
+      });
+      console.log('comparing ', answer, ' and ', this.Trails[0].chosen_answer);
+    } else var index = this.Trails.findIndex(function (trail) {
+      return trail.question_id == question.id && trail.chosen_answer == answer.id;
+    });
+
+    if (index >= 0) {
+      return this.Trails[index].is_correct_choice;
+    }
+
+    return false;
+  },
+  IsChosenAnswer: function IsChosenAnswer(answer, question) {
+    if (question.question_type === 1) {
+      var index = this.Trails.findIndex(function (trail) {
+        return trail.question_id == question.id && trail.chosen_answer == answer;
+      });
+      console.log('comparing ', answer, ' and ', this.Trails[0].chosen_answer);
+    } else var index = this.Trails.findIndex(function (trail) {
+      return trail.question_id == question.id && trail.chosen_answer == answer.id;
+    });
+
+    if (index >= 0) {
+      return true;
+    }
+
+    return false;
   }
 }), _defineProperty(_Vue, "components", {
   'math-comp': _components_maths_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
-  'quiz-info': _components_quiz_info_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
+  'quiz-info': _components_quiz_info_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
+  'result-chart': _components_resultprojectchart_vue__WEBPACK_IMPORTED_MODULE_5__["default"]
 }), _Vue));
 
 /***/ }),

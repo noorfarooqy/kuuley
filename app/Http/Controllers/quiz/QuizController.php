@@ -123,36 +123,11 @@ class QuizController extends Controller
             return Response()->json(["success_message" => false, "data" => [], "error_message" => "could not find the quiz"], 404);
         }
         $Trails = $quiz->Trials->where('trail_completed', true)->where('student_id', $user->id);
-        $trail_list = [];
+
         // $trail_result = new Collection();
-        $trail_result = [];
+        $trail_result = $this->CalculatePerformance($Trails);
         $questions = $quiz->Questions;
-        foreach ($Trails as $key => $trail) {
 
-            // $question = $trail->Question;
-
-            if (in_array($trail->trail_count, $trail_list)) {
-                $index = array_search($trail->trail_count, $trail_list);
-                if ($trail->is_correct_choice) {
-                    $trail_result[$index]["result"] += 1;
-                }
-                $trail_result[$index]["total"] += 1;
-            } else {
-                $result = 0;
-                if ($trail->is_correct_choice) {
-                    $result = 1;
-                }
-                $date = $trail->updated_at->format('Y-m-d    H:i:s');
-                array_push($trail_result, [
-                    "date" => $date,
-                    "result" => $result,
-                    "total" => 1,
-                    "quiz" => $trail->quiz_id,
-                    "trail" => $trail->trail_count
-                ]);
-                array_push($trail_list, $trail->trail_count);
-            }
-        }
 
         // $trail_result["total"] = $questions->count();
         foreach ($questions as $key => $question) {
@@ -325,8 +300,10 @@ class QuizController extends Controller
         $trail = QuestionResultsModel::where([
             ['trail_count', $trail_count],
             ['quiz_id', $quiz_id],
-            // ['student_id', $user->id]
+            ['student_id', $user->id]
         ])->get();
+        abort_if($trail == null || $trail->count() <= 0, 403, 'There are no reports for this quiz.');
+        $quiz = $quiz[0];
 
         abort_if($trail == null || $trail->count() <= 0, 404, 'Could not find the trail report of the quiz');
 
@@ -551,7 +528,42 @@ class QuizController extends Controller
         return $this->ResponseSuccess([$questions, $trail_list]);
     }
 
-    public function ResponseError($error, $error_description = null)
+    public function GetQuizReport(Request $request)
+    {
+        $user = $request->user();
+
+        $rules = [
+            "quiz" => "required|integer|exists:quizes,id",
+            "trail_count" => "required|integer|exists:question_results,trail_count"
+        ];
+
+
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return $this->ResponseError($validator->errors()->first());
+        }
+        $data = $validator->validated();
+        $questions = QuestionsModel::where('quiz_id', $data["quiz"])->with('answers')->get();
+
+        if ($questions == null || $questions->count() <= 0) {
+            return $this->ResponseError('Failed to get the questions for this quiz report');
+        }
+        $trail = QuestionResultsModel::where([
+            ['quiz_id', $data["quiz"]],
+            ['trail_count', 3],
+            ['student_id', 2],
+            ['trail_completed', true]
+
+        ])->get();
+
+        if ($trail == null || $trail->count() <= 0) {
+            return $this->ResponseError('The quiz results could not be found. Ensure you have submitted the answers');
+        }
+
+        return $this->ResponseSuccess([$questions, $trail, $this->CalculatePerformance($trail)]);
+    }
+
+    protected function ResponseError($error, $error_description = null)
     {
         return Response()->json([
             "success_message" => false,
@@ -560,11 +572,50 @@ class QuizController extends Controller
             "error_description" => $error_description
         ]);
     }
-    public function ResponseSuccess($data, $message = 'successful')
+    protected function ResponseSuccess($data, $message = 'successful')
     {
         return Response()->json([
             "success_message" => $message,
             "data" => $data
         ]);
+    }
+
+    protected function CalculatePerformance($Trails)
+    {
+        $trail_result = [];
+        $trail_list = [];
+        $first_time = Carbon::now();
+        foreach ($Trails as $key => $trail) {
+
+            // $question = $trail->Question;
+
+            if (in_array($trail->trail_count, $trail_list)) {
+                $index = array_search($trail->trail_count, $trail_list);
+                if ($trail->is_correct_choice) {
+                    $trail_result[$index]["result"] += 1;
+                }
+                $trail_result[$index]["total"] += 1;
+                $trail_result[$index]["time"] = gmdate('H:i:s', ($trail->updated_at->diffInSeconds($first_time)));
+            } else {
+                $result = 0;
+                if ($trail->is_correct_choice) {
+                    $result = 1;
+                }
+                $date = $trail->updated_at->format('Y-m-d H:i:s');
+                array_push($trail_result, [
+                    "date" => $date,
+                    "result" => $result,
+                    "total" => 1,
+                    "quiz" => $trail->quiz_id,
+                    "trail" => $trail->trail_count,
+                    "created_at" => $trail->created_at,
+                    "time" => $trail->created_at->diffInMinutes($trail->updated_at)
+                ]);
+                $first_time = $trail->created_at;
+                array_push($trail_list, $trail->trail_count);
+            }
+        }
+
+        return $trail_result;
     }
 }
