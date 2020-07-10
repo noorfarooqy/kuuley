@@ -2097,6 +2097,76 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -2109,10 +2179,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      name: 'maths-vue',
-      version: '1.0',
-      formula: '',
-      formula_answer: '',
+      name: "maths-vue",
+      version: "1.0",
+      formula: "",
+      formula_answer: "",
       ForumalErrors: new _ErrorsText__WEBPACK_IMPORTED_MODULE_7__["default"]().Formula,
       errors: [],
       Signs: new _quizes_signs__WEBPACK_IMPORTED_MODULE_1__["default"](),
@@ -2120,42 +2190,40 @@ __webpack_require__.r(__webpack_exports__);
       QuizQuestion: this.type == 1 ? new _quizes_true_false_question__WEBPACK_IMPORTED_MODULE_3__["default"]() : this.type == 2 ? new _quizes_single_choice_question__WEBPACK_IMPORTED_MODULE_2__["default"]() : new _quizes_multi_choice_question__WEBPACK_IMPORTED_MODULE_4__["default"]()
     };
   },
-  mounted: function mounted() {},
+  mounted: function mounted() {
+    this.$emit("get-course-list");
+  },
   methods: {
     GetMathsPreview: function GetMathsPreview() {
-      return '$$ ' + this.QuizQuestion.question_text + ' $$';
+      return "$$ " + this.QuizQuestion.question_text + " $$";
     },
     AddAnswerFormula: function AddAnswerFormula() {
-      return '$$' + this.formula_answer + '$$';
+      return "$$" + this.formula_answer + "$$";
     },
     RecordAnswer: function RecordAnswer() {
       this.errors = [];
 
       if (this.QuizQuestion.question_text != null && this.QuizQuestion.question_text.length >= 3) {
         this.QuizQuestion.NewAnswer(this.formula_answer);
-        this.formula_answer = '';
-      } else this.errors.push(this.ForumalErrors.formula_incomplete); // if(this.QuizQuestion.question_text == null || this.QuizQuestion.question_text.length <= 0){
-      //     this.errors.push(this.ForumalErrors.formula_incomplete);
-      // }
-      // else if(this.formula_answer == null || this.formula_answer.length <= 0){
-      //     this.errors.push(this.ForumalErrors.formula_incomplete);
-      // }
-      // else{
-      //     this.QuizQuestion.NewAnswer(this.AddAnswerFormula());
-      //     this.formula_answer = '';
-      // }
-
+        this.formula_answer = "";
+      } else this.errors.push(this.ForumalErrors.formula_incomplete);
     },
     getEditorElement: function getEditorElement() {
       var answer = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
       if (answer) {
-        console.log('for asnwer ');
+        console.log("for asnwer ");
         return this.$refs.formula_answer;
       } else {
-        console.log('for qeustion ');
+        console.log("for qeustion ");
         return this.$refs.formula;
       }
+    },
+    GetCourseLessons: function GetCourseLessons(event) {
+      console.log("event event ", event);
+      var options = event.target;
+      var selectedIndex = options.selectedIndex;
+      this.$emit("get-course-lessons", options.options[selectedIndex].value);
     },
     UpdateAnswers: function UpdateAnswers(answer) {
       this.QuizQuestion.UpdateAnswers(answer);
@@ -2166,35 +2234,55 @@ __webpack_require__.r(__webpack_exports__);
     ShowQuizQuestions: function ShowQuizQuestions(data) {
       console.log(data);
     },
-    ShowErrors: function ShowErrors(error) {
+    showErrors: function showErrors(error) {
+      // alert(error);
+      console.log("error ", error);
       this.errors.push(error);
+      var alertor = document.querySelector("div.error-alert-toast");
+      console.log("laertor ", $(alertor).children("div.toast-danger").children("div.toast-message"));
+      $(alertor).css("display", "block");
+      $(alertor).children("div.toast-danger").children("div.toast-message").text(error);
+      setTimeout(function () {
+        $(alertor).css("display", "none");
+      }, 10000);
+      this.ToggleLoader();
+    },
+    ToggleLoader: function ToggleLoader(status) {
+      var loader = document.querySelector("div#modal-success");
+      var toggle;
+      if (status == null || status == false) toggle = "none";else toggle = "block";
+      $(loader).css("display", toggle);
     },
     SubmitQuestion: function SubmitQuestion() {
       this.errors = [];
+      this.ToggleLoader(true);
 
       if (this.QuizQuestion.QuestionIsValid(this.ForumalErrors)) {
         this.Server.setRequest({
           question_type: this.type,
           question_text: this.QuizQuestion.question_text,
           answers: this.QuizQuestion.answers,
+          related_topic: this.QuizQuestion.related_topic,
+          related_lesson: this.QuizQuestion.related_lesson,
           quiz_id: window.quiz_id,
           api_token: window.api_token
         });
-        this.Server.serverRequest('/api/admin/quiz/new', this.QuestionAdded, this.ShowErrors);
-      } else this.errors.push(this.QuizQuestion.GetErrorMessage());
+        this.Server.serverRequest("/api/admin/quiz/new", this.QuestionAdded, this.showErrors);
+      } else this.showErrors(this.QuizQuestion.GetErrorMessage());
     },
     QuestionAdded: function QuestionAdded(data) {
       // this.Questions.push(data);
-      this.$emit('new-quiz-added', data);
-      alert('New question has been added successfully');
+      this.$emit("new-quiz-added", data);
+      alert("New question has been added successfully");
+      this.ToggleLoader();
     }
   },
   components: {
-    'vue-mathjax': vue_mathjax__WEBPACK_IMPORTED_MODULE_0__["VueMathjax"],
-    'formula-icons': _components_formula_icons_vue__WEBPACK_IMPORTED_MODULE_5__["default"],
-    'error-component': _components_error_vue__WEBPACK_IMPORTED_MODULE_6__["default"]
+    "vue-mathjax": vue_mathjax__WEBPACK_IMPORTED_MODULE_0__["VueMathjax"],
+    "formula-icons": _components_formula_icons_vue__WEBPACK_IMPORTED_MODULE_5__["default"],
+    "error-component": _components_error_vue__WEBPACK_IMPORTED_MODULE_6__["default"]
   },
-  props: ['type']
+  props: ["type", "courses", "lessons"]
 });
 
 /***/ }),
@@ -40512,6 +40600,7 @@ var render = function() {
                 _c("label", { attrs: { for: "subscribe" } }, [
                   _vm._v("Select if answer is true")
                 ]),
+                _vm._v(" "),
                 _c("br"),
                 _vm._v(" "),
                 _c(
@@ -40626,7 +40715,7 @@ var render = function() {
               _vm._v(" "),
               _c("div", { staticClass: "col-md-4 col-lg-4" }, [
                 _c("label", { attrs: { for: "control-label h6" } }, [
-                  _vm._v(" - ")
+                  _vm._v("-")
                 ]),
                 _vm._v(" "),
                 _c(
@@ -40678,11 +40767,11 @@ var render = function() {
                     _c("span", { staticClass: "mr-2" }, [
                       answer.is_correct
                         ? _c("i", {
-                            staticClass: "fa fa-check-circle ",
+                            staticClass: "fa fa-check-circle",
                             staticStyle: { color: "green" }
                           })
                         : _c("i", {
-                            staticClass: "fa fa-times-circle ",
+                            staticClass: "fa fa-times-circle",
                             staticStyle: { color: "red" }
                           })
                     ]),
@@ -40757,6 +40846,122 @@ var render = function() {
           ])
         : _vm._e(),
       _vm._v(" "),
+      _c("div", { staticClass: "form-group" }, [
+        _c("label", { staticClass: "label", attrs: { for: "relatedTopic" } }, [
+          _vm._v("Related topic*")
+        ]),
+        _vm._v(" "),
+        _c(
+          "select",
+          {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.QuizQuestion.related_topic,
+                expression: "QuizQuestion.related_topic"
+              }
+            ],
+            staticClass: "form-control",
+            attrs: { name: "relatedTopic", id: "" },
+            on: {
+              change: [
+                function($event) {
+                  var $$selectedVal = Array.prototype.filter
+                    .call($event.target.options, function(o) {
+                      return o.selected
+                    })
+                    .map(function(o) {
+                      var val = "_value" in o ? o._value : o.value
+                      return val
+                    })
+                  _vm.$set(
+                    _vm.QuizQuestion,
+                    "related_topic",
+                    $event.target.multiple ? $$selectedVal : $$selectedVal[0]
+                  )
+                },
+                function($event) {
+                  $event.preventDefault()
+                  return _vm.GetCourseLessons($event)
+                }
+              ]
+            }
+          },
+          [
+            _c("option", { attrs: { value: "-1", selected: "" } }, [
+              _vm._v("Select related topics")
+            ]),
+            _vm._v(" "),
+            _vm._l(_vm.courses, function(course, ckey) {
+              return _c(
+                "option",
+                { key: ckey, domProps: { value: course.id } },
+                [_vm._v(_vm._s(course.course_name))]
+              )
+            })
+          ],
+          2
+        )
+      ]),
+      _vm._v(" "),
+      _vm.lessons != null
+        ? _c("div", { staticClass: "form-group" }, [
+            _c(
+              "label",
+              { staticClass: "label", attrs: { for: "relatedTopic" } },
+              [_vm._v("Related Lesson")]
+            ),
+            _vm._v(" "),
+            _c(
+              "select",
+              {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.QuizQuestion.related_lesson,
+                    expression: "QuizQuestion.related_lesson"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: { name: "relatedTopic", id: "" },
+                on: {
+                  change: function($event) {
+                    var $$selectedVal = Array.prototype.filter
+                      .call($event.target.options, function(o) {
+                        return o.selected
+                      })
+                      .map(function(o) {
+                        var val = "_value" in o ? o._value : o.value
+                        return val
+                      })
+                    _vm.$set(
+                      _vm.QuizQuestion,
+                      "related_lesson",
+                      $event.target.multiple ? $$selectedVal : $$selectedVal[0]
+                    )
+                  }
+                }
+              },
+              [
+                _c("option", { attrs: { value: "-1", selected: "" } }, [
+                  _vm._v("Select related lessons")
+                ]),
+                _vm._v(" "),
+                _vm._l(_vm.lessons, function(lesson, lkey) {
+                  return _c(
+                    "option",
+                    { key: lkey, domProps: { value: lesson.id } },
+                    [_vm._v(_vm._s(lesson.lessonTitle))]
+                  )
+                })
+              ],
+              2
+            )
+          ])
+        : _vm._e(),
+      _vm._v(" "),
       _c(
         "button",
         {
@@ -40770,7 +40975,7 @@ var render = function() {
         },
         [
           _c("i", { staticClass: "material-icons" }, [_vm._v("add")]),
-          _vm._v("Create Question\n    ")
+          _vm._v("Create Question\n  ")
         ]
       )
     ],
@@ -53630,6 +53835,8 @@ var Quiz = /*#__PURE__*/function () {
     this.answers = [];
     this.existing_keys = [];
     this.error_message = null;
+    this.related_topic = -1;
+    this.related_lesson = -1;
   }
 
   _createClass(Quiz, [{

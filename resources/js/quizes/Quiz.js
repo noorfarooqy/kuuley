@@ -1,18 +1,19 @@
 class Quiz {
 
-    constructor(){
+    constructor() {
         this.question_text = '';
         this.answers = [];
         this.existing_keys = [];
         this.error_message = null;
+        this.related_topic = -1;
+        this.related_lesson = -1;
     }
 
-    QuestionIsValid(Errors){
-        if(this.question_text == null || this.question_text.length <= 0){
+    QuestionIsValid(Errors) {
+        if (this.question_text == null || this.question_text.length <= 0) {
             this.error_message = Errors.formula_incomplete;
             return false;
-        }
-        else if(this.answers == null || this.answers.length <= 0){
+        } else if (this.answers == null || this.answers.length <= 0) {
             this.error_message = Errors.answer_missing;
             return false;
         }
@@ -20,7 +21,7 @@ class Quiz {
 
     }
 
-    GetErrorMessage(){
+    GetErrorMessage() {
         return this.error_message;
     }
 }

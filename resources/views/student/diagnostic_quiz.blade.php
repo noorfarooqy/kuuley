@@ -145,22 +145,28 @@
                                 <th>#</th>
                                 <th>Diagostic</th>
                                 <th>Status</th>
-                                <td>Date</td>
+                                <th>Date</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($Diagnostics as $quiz)
-                            <tr>
-                                <td></td>
-                                <td>
-                                    <a href="#" @click.prevent="GetDiagnostic({{$quiz->QuizInfo}})">
-                                        {{$quiz->QuizInfo->quiz_title}}
-                                    </a>
-                                </td>
-                                <td>{{$quiz->QuizInfo->Trials->count()}}</td>
-                                <td>{{$quiz->updated_at->format('Y-m-d')}}</td>
-                            </tr>
-                            @endforeach
+                            @php
+                            // foreach ($Diagnostics as $key => $quiz) {
+                            //     echo "<tr>
+                            //         <td> ".($key+1)." </td>
+                            //         <td> 
+                            //             <a href='#' @click.prevent='GetDiagnostic(".$quiz->QuizInfo.")'> ".
+                            //                 $quiz->QuizInfo->quiz_title.
+                            //             "</a>
+                            //         </td>
+                            //         <td>".
+                            //             $quiz->QuizInfo->Trials->count().
+                            //         "</td>
+                            //         <td>".
+                            //             $quiz->updated_at->format('Y-m-d').
+                            //         "</td>
+                            //     </tr>";
+                            // }
+                            @endphp
                         </tbody>
                     </table>
 

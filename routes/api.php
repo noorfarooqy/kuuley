@@ -37,5 +37,6 @@ Route::middleware('auth:api')->group(function () {
     });
     Route::prefix('/courses')->group(function () {
         Route::post('/lessons', 'courses\CourseController@GetCourseLessons');
+        Route::post('/list', 'courses\CourseController@GetCourseList');
     });
 });

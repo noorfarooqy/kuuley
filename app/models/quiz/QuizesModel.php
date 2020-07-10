@@ -52,7 +52,7 @@ class QuizesModel extends Model
             $newQuestion = $QuestionModel->NewTrueOrFalseQuestion($data, $this->id);
             if (!$newQuestion) {
                 $this->error = $QuestionModel->getError();
-                return true;
+                return false;
             }
             return $newQuestion;
         } else if (
@@ -62,7 +62,7 @@ class QuizesModel extends Model
             $newQuestion = $QuestionModel->NewChoiceQuestion($data, $this->id);
             if (!$newQuestion) {
                 $this->error = $QuestionModel->getError();
-                return true;
+                return false;
             }
             return $newQuestion;
         } else {

@@ -15,6 +15,8 @@ class QuestionsModel extends Model
         "question_text",
         "question_type",
         "is_deleted",
+        "question_topic",
+        "question_lesson"
     ];
     protected $error = null;
     public $trueOrFalseType = 1;
@@ -36,6 +38,7 @@ class QuestionsModel extends Model
         } catch (Exception $e) {
             //throw $th;
             $this->error = $e->getMessage();
+            return false;
         }
     }
     public function NewChoiceQuestion($data, $quiz_id)
@@ -51,8 +54,8 @@ class QuestionsModel extends Model
             }
             return $question;
         } catch (Exception $e) {
-            //throw $th;
             $this->error = $e->getMessage();
+            return false;
         }
     }
 
@@ -62,6 +65,8 @@ class QuestionsModel extends Model
             "quiz_id" => $quiz,
             "question_text" => $data["question_text"],
             "question_type" => $type,
+            "question_topic" => $data["related_topic"],
+            "question_lesson" => isset($data["related_lesson"]) ? $data["related_lesson"] : null,
         ]);
     }
 

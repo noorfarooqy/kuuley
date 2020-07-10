@@ -64,7 +64,10 @@
 
 
 
-                                            <math-comp v-bind="{type:1}" v-on:new-quiz-added="AddNewQuestion">
+                                            <math-comp  v-on:get-course-list="GetCourseList()"
+                                            v-on:get-course-lessons="GetCourseLessons"
+                                            v-on:new-quiz-added="AddNewQuestion"
+                                            v-bind="{type:1, courses:Courses , lessons:Lessons}" >
                                             </math-comp>
 
 
@@ -84,10 +87,13 @@
                                         <form action="#">
 
 
-                                            <math-comp v-bind="{type:2}"></math-comp>
 
-                                            {{-- <button class="btn btn-primary mt-3"><i class="material-icons">add</i>
-                                                Create Question</button> --}}
+                                            <math-comp  v-on:get-course-list="GetCourseList()"
+                                            v-on:get-course-lessons="GetCourseLessons"
+                                            v-on:new-quiz-added="AddNewQuestion"
+                                            v-bind="{type:2, courses:Courses , lessons:Lessons}" >
+                                            </math-comp>
+
                                         </form>
                                     </div>
                                 </div>
@@ -101,10 +107,14 @@
                                     <div class="card-body card-form__body">
                                         <form action="#">
 
-                                            <math-comp v-bind="{type:3}"></math-comp>
+                                            
 
-                                            {{-- <button class="btn btn-primary mt-3"><i class="material-icons">add</i>
-                                                Create Question</button> --}}
+                                            <math-comp  v-on:get-course-list="GetCourseList()"
+                                            v-on:get-course-lessons="GetCourseLessons"
+                                            v-on:new-quiz-added="AddNewQuestion"
+                                            v-bind="{type:3, courses:Courses , lessons:Lessons}" >
+                                            </math-comp>
+
                                         </form>
                                     </div>
                                 </div>
@@ -119,10 +129,7 @@
 
                                     </div>
                                     <div class="card-body card-form__body">
-                                        We are still working on this question type this later. this later.
-                                        this later.
-
-                                        this later.
+                                        We are still working on this question type.
 
                                     </div>
                                 </div>

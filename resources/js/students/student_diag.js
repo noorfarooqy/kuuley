@@ -34,6 +34,7 @@ var app = new Vue({
     },
     methods: {
         GetDiagnostic(quiz) {
+            console.log('quiz ', quiz);
             this.ToggleLoader(true);
             this.Server.setRequest({
                 api_token: window.api_token,

@@ -160,6 +160,8 @@ class QuizController extends Controller
             "question_type" => "required|integer|in:1,2,3",
             "question_text" => "required|string|max:1200|min:3",
             "quiz_id" => "required|integer|exists:quizes,id",
+            "related_topic" => "required|integer|exists:courses,id",
+            "related_lesson" => "nullable|integer|exists:lessons,id"
         ];
         if ($request->question_type >= 2) {
             $rules["answers"] = "required|array";
@@ -187,21 +189,11 @@ class QuizController extends Controller
                     $has_correct = true;
             }
             if (!$has_correct)
-                return Response()->json([
-                    "success_message" => false,
-                    "data" => [],
-                    "error_message" => "Please provide at least one correct answer",
-                    "error_description" => '',
-                ]);
+                return $this->ResponseError("Please provide at least one correct answer");
         }
         $NewQuestion = $QuizModel->AddNewQuestion($data);
-        if (!$NewQuestion) {
-            return Response()->json([
-                "success_message" => false,
-                "data" => [],
-                "error_message" => "Failed to add the new question. Contact Adminstrator for assistance",
-                "error_description" => $QuizModel->getError(),
-            ]);
+        if ($NewQuestion == false || $NewQuestion == null) {
+            return $this->ResponseError("Failed to add the new question. Contact Adminstrator for assistance", $QuizModel->getError());
         }
         $answers = $NewQuestion->Answers;
         return Response()->json(["success_message" => true, "data" => $NewQuestion]);
@@ -480,7 +472,12 @@ class QuizController extends Controller
         if (!$user->is_student)
             return $this->ResponseError("Permission denied. ");
 
-
+        $rules = [
+            "quiz" => "required|integer|exists:quizes,id"
+        ];
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails())
+            return $this->ResponseError($validator->errors()->first());
         $quiz = QuizesModel::where('id', $request->quiz)->get()[0];
         if ($quiz == null || $quiz->count() <= 0)
             return $this->ResponseError('The selected diagnostic quiz could not be verified');

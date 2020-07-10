@@ -258,7 +258,10 @@ class CourseController extends Controller
     public function GetCourseLessons(Request $request)
     {
         $user = $request->user();
-        if (!$user->is_student) {
+        $admin = $user->isAdmin;
+        if ($admin != null && $admin->course_permission < $admin->perm_read)
+            return $this->ResponseError('Permission denied as administrator');
+        else if (!$user->is_student) {
             return $this->ResponseError('Permission denied');
         }
 
@@ -282,7 +285,17 @@ class CourseController extends Controller
         return $this->ResponseSuccess($lessons);
     }
 
+    public function GetCourseList(Request $request)
+    {
+        $user = $request->user();
 
+        $admin = $user->isAdmin;
+        if ($admin->course_permission < $admin->perm_read)
+            return $this->ResponseError('You do not have permission. Access denied');
+        $courses = CoursesModel::all();
+
+        return $this->ResponseSuccess($courses);
+    }
 
     public function ResponseError($error, $error_description = null)
     {

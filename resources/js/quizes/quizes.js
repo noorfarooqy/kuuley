@@ -17,6 +17,8 @@ var app = new Vue({
             answer: null,
         },
         SubmittedResults: [],
+        Courses: [],
+        Lessons: null,
 
     },
     methods: {
@@ -89,6 +91,34 @@ var app = new Vue({
                 alert('succesfully deleted the question');
             }
 
+        },
+        GetCourseList() {
+            this.ToggleLoader(true);
+            this.Server.setRequest({
+                api_token: window.api_token
+            });
+            this.Server.serverRequest('/api/courses/list', this.SetCourseList, this.showErrors);
+        },
+        GetCourseLessons(course) {
+            console.log('will get lesson fro ', course);
+            if (course == -1 || course == null) {
+                this.Lessons = null;
+                return;
+            }
+            this.ToggleLoader(true);
+            this.Server.setRequest({
+                api_token: window.api_token,
+                course_id: course
+            });
+            this.Server.serverRequest('/api/courses/lessons', this.SetCourseLessons, this.showErrors);
+        },
+        SetCourseLessons(data) {
+            this.Lessons = data;
+            this.ToggleLoader();
+        },
+        SetCourseList(data) {
+            this.Courses = data;
+            this.ToggleLoader();
         },
         AddNewQuestion(question) {
             this.Questions.push(question);
