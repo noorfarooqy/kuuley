@@ -17,6 +17,7 @@ var app = new Vue({
             answer: null,
         },
         SubmittedResults: [],
+        topic_results: [],
         Courses: [],
         Lessons: null,
 
@@ -46,8 +47,9 @@ var app = new Vue({
     },
     methods: {
         setQuizQuestions(data) {
-            this.Questions = data[0];
-            this.SubmittedResults = data[1];
+            this.Questions = data.questions;
+            this.SubmittedResults = data.results.trail_results;
+            this.topic_results = data.results.topic_results;
             this.ToggleLoader();
         },
 

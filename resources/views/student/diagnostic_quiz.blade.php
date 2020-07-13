@@ -7,7 +7,7 @@
 
     <div class="container-fluid page__heading-container">
         <div class="page__heading d-flex align-items-center justify-content-between">
-            <h1 class="m-0">Student Diagnostics</h1>
+            <h1 class="m-0">Student Diagnostics - </h1>
         </div>
     </div>
 
@@ -31,7 +31,7 @@
             <div class="col-md-7">
                 <div class="card" v-if="Questions != null && Questions.length > 0">
                     <div class="card-header">
-                        @{{}}
+                        
                     </div>
                     <div class="card-body">
                         <div class="card mb-4" data-position="1" data-question-id="1">
@@ -119,7 +119,7 @@
 
                                 </div>
                             </div>
-                            <div class="btn btn-primary" @click.prevent="submitQuiz(1)">
+                            <div class="btn btn-primary" @click.prevent="submitQuiz(Questions[0].quiz_id)">
                                 Submit Assignment</div>
                         </div>
                     </div>
@@ -131,6 +131,30 @@
                     </div>
                     <div class="card-body">
                         select Diagnostics to view questions
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header"></div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead class="thead">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Trial date</th>
+                                    <th>Result</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(result, rkey) in SubmittedResults">
+                                    <td v-text="rkey+1"></td>
+                                    <td >
+                                        <a :href="'/student/trail/'+result['quiz']+'/'+result['trail']" v-text="result['date']"></a>
+                                    </td>
+                                    <td v-text="((result['result']/result['total'])*100).toFixed(2) + '%'"></td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
@@ -145,28 +169,22 @@
                                 <th>#</th>
                                 <th>Diagostic</th>
                                 <th>Status</th>
-                                <th>Date</th>
+                                <td>Date</td>
                             </tr>
                         </thead>
                         <tbody>
-                            @php
-                            // foreach ($Diagnostics as $key => $quiz) {
-                            //     echo "<tr>
-                            //         <td> ".($key+1)." </td>
-                            //         <td> 
-                            //             <a href='#' @click.prevent='GetDiagnostic(".$quiz->QuizInfo.")'> ".
-                            //                 $quiz->QuizInfo->quiz_title.
-                            //             "</a>
-                            //         </td>
-                            //         <td>".
-                            //             $quiz->QuizInfo->Trials->count().
-                            //         "</td>
-                            //         <td>".
-                            //             $quiz->updated_at->format('Y-m-d').
-                            //         "</td>
-                            //     </tr>";
-                            // }
-                            @endphp
+                            @foreach ($Diagnostics as $quiz)
+                            <tr>
+                                <td></td>
+                                <td>
+                                    <a href="#" @click.prevent="GetDiagnostic({{$quiz->QuizInfo}})">
+                                        {{$quiz->QuizInfo->quiz_title}}
+                                    </a>
+                                </td>
+                                <td>{{$quiz->QuizInfo->Trials->count()}}</td>
+                                <td>{{$quiz->updated_at->format('Y-m-d')}}</td>
+                            </tr>
+                            @endforeach
                         </tbody>
                     </table>
 
@@ -181,9 +199,12 @@
 @endsection
 
 @section('scripts')
-<script>
-    window.api_token = "{{Auth::user()->api_token}}";
+@php
+    $api_token = Auth::user()->api_token;
+@endphp
 
+<script>
+    window.api_token = "{{$api_token}}"
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_HTML"></script>

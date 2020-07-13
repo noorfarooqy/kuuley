@@ -158,34 +158,20 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="bg-soft-warning">
-                                <td class="text-dark">Fractions topic</td>
+                            <tr :class="GetBackGroundInfo(topic)" v-for="(topic,tkey) in topic_results" :key="tkey">
+                                <td class="text-dark" v-text="topic.topic_name"></td>
                                 <td>
 
                                     <div class="progress">
-                                        <div class="progress-bar bg-danger" role="progressbar" style="width: 25%;"
-                                            aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
-                                            25%
+                                        <div class="progress-bar" role="progressbar"  :class="GetBackGroundInfo(topic,1)"
+                                        :style="'width: '+((topic.topic_result/topic.topic_total)*100).toFixed(0)+'%;'"
+                                        aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+                                            @{{((topic.topic_result/topic.topic_total)*100).toFixed(0)}}%
                                         </div>
                                     </div>
                                 </td>
                                 <td class="text-dark">
-                                    Poor
-                                </td>
-                            </tr>
-                            <tr class="bg-soft-success">
-                                <td class="text-dark">Fractions topic</td>
-                                <td>
-
-                                    <div class="progress">
-                                        <div class="progress-bar bg-success" role="progressbar" style="width: 25%;"
-                                            aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
-                                            65%
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="text-dark">
-                                    Good
+                                    @{{GetFeedBackType(((topic.topic_result/topic.topic_total)*100).toFixed(0))}}
                                 </td>
                             </tr>
                         </tbody>

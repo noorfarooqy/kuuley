@@ -53982,6 +53982,7 @@ var app = new Vue((_Vue = {
     Server: new _server__WEBPACK_IMPORTED_MODULE_3__["default"](),
     Questions: [],
     Trails: [],
+    topic_results: [],
     Results: null
   },
   methods: {
@@ -54003,9 +54004,10 @@ var app = new Vue((_Vue = {
 }, _defineProperty(_Vue, "methods", {
   SetQuizReport: function SetQuizReport(data) {
     console.log('data ', data);
-    this.Questions = data[0];
-    this.Trails = data[1];
-    this.Results = data[2][0];
+    this.Questions = data.questions;
+    this.Trails = data.trail;
+    this.Results = data.results.trail_result[0];
+    this.topic_results = data.results.topic_result;
     this.ToggleLoader();
   },
   showErrors: function showErrors(error) {
@@ -54081,6 +54083,19 @@ var app = new Vue((_Vue = {
     }
 
     return false;
+  },
+  GetFeedBackType: function GetFeedBackType(score) {
+    if (score >= 90) return 'Excelent';else if (score >= 80) return 'Very Good';else if (score >= 70) return 'Good';else if (score >= 60) return 'Average';else return 'Below Average';
+  },
+  GetBackGroundInfo: function GetBackGroundInfo(topic) {
+    var n = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+    var value = (topic.topic_result / topic.topic_total * 100).toFixed(0);
+
+    if (n == 1) {
+      if (value > 60) return 'bg-success';else return 'bg-danger';
+    } else {
+      if (value > 60) return 'bg-soft-success';else return 'bg-soft-danger';
+    }
   }
 }), _defineProperty(_Vue, "components", {
   'math-comp': _components_maths_vue__WEBPACK_IMPORTED_MODULE_0__["default"],

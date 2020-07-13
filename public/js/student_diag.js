@@ -16749,6 +16749,7 @@ var app = new Vue((_Vue = {
     Quizerrors: [],
     Server: new _server__WEBPACK_IMPORTED_MODULE_3__["default"](),
     Questions: [],
+    topic_results: [],
     Answer: {
       question_id: null,
       answer: null
@@ -16779,8 +16780,9 @@ var app = new Vue((_Vue = {
     this.Server.serverRequest('/api/student/quiz/diag', this.setQuizQuestions, this.showErrors);
   },
   setQuizQuestions: function setQuizQuestions(data) {
-    this.Questions = data[0];
-    this.SubmittedResults = data[1];
+    this.Questions = data.questions;
+    this.SubmittedResults = data.results.trail_results;
+    this.topic_results = data.results.topic_results;
     this.ToggleLoader();
   },
   showErrors: function showErrors(error) {

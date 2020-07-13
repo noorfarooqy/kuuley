@@ -330,7 +330,7 @@ class QuizController extends Controller
             return $this->ResponseError('The particular queston does not exist or has been deleted ');
         $lesson = LessonsModel::where('assignment_id', $question->quiz_id)->get();
         // return [$lesson];
-        if (($lesson == null || $lesson->count() <= 0) && $request->question_type == null)
+        if (($lesson == null || $lesson->count() <= 0) && $question->questionQuiz->is_diagnostic == false)
             return $this->ResponseError('The lesson to this assignment could not be found');
         $answers = AnswersModel::where('question_id', $request->question_id)->get();
         if ($answers == null || $answers->count() <= 0)
@@ -484,31 +484,7 @@ class QuizController extends Controller
         $Trails = $quiz->Trials;
         if ($Trails != null)
             $Trails = $Trails->where('trail_completed', true);
-        $trail_list = [];
-        // $trail_result = new Collection();
-        $trail_result = [];
         $questions = $quiz->Questions;
-        if ($Trails != null)
-            foreach ($Trails as $key => $trail) {
-
-                // $question = $trail->Question;
-
-                if (in_array($trail->trail_count, $trail_list)) {
-                    $index = array_search($trail->trail_count, $trail_list);
-                    if ($trail->is_correct_choice) {
-                        $trail_result[$index]["result"] += 1;
-                    }
-                    $trail_result[$index]["total"] += 1;
-                } else {
-                    $result = 0;
-                    if ($trail->is_correct_choice) {
-                        $result = 1;
-                    }
-                    $date = $trail->updated_at->format('Y-m-d    H:i:s');
-                    array_push($trail_result, ["date" => $date, "result" => $result, "total" => 1]);
-                    array_push($trail_list, $trail->trail_count);
-                }
-            }
         foreach ($questions as $key => $question) {
 
             $question->Answers;
@@ -522,7 +498,7 @@ class QuizController extends Controller
             } else
                 $questions[$key]->answer = $answers == null || $answers->count() <= 0 ? null : $answers[0]->chosen_answer;
         }
-        return $this->ResponseSuccess([$questions, $trail_list]);
+        return $this->ResponseSuccess([$questions, $this->CalculatePerformance($Trails)]);
     }
 
     public function GetQuizReport(Request $request)
@@ -547,8 +523,8 @@ class QuizController extends Controller
         }
         $trail = QuestionResultsModel::where([
             ['quiz_id', $data["quiz"]],
-            ['trail_count', 3],
-            ['student_id', 2],
+            ['trail_count', $data["trail_count"]],
+            ['student_id', $user->id],
             ['trail_completed', true]
 
         ])->get();
@@ -557,7 +533,7 @@ class QuizController extends Controller
             return $this->ResponseError('The quiz results could not be found. Ensure you have submitted the answers');
         }
 
-        return $this->ResponseSuccess([$questions, $trail, $this->CalculatePerformance($trail)]);
+        return $this->ResponseSuccess(["questions" => $questions, "trail" => $trail, "results" => $this->CalculatePerformance($trail)]);
     }
 
     protected function ResponseError($error, $error_description = null)
@@ -582,9 +558,33 @@ class QuizController extends Controller
         $trail_result = [];
         $trail_list = [];
         $first_time = Carbon::now();
+        $topic = [];
+        //at the time of adding the topic result tracking, 
+        // there was a mysterious problem and the in_array for assoc keeps returnning false
+        //so i had to create the topic_tracker_index solve that way
+        $topic_track_index = [];
         foreach ($Trails as $key => $trail) {
 
-            // $question = $trail->Question;
+            $question = $trail->Question;
+            //if corresponding question details are not found for whatever reason,
+            //then topic analaysis cannot be done, so just set it to null
+            if ($question != null && $question->count() > 0) {
+                $course = $question->CourseRelated;
+                if (!in_array(hash('md5', $course->id), $topic_track_index)) {
+                    array_push($topic, [
+                        "topic_name" => $course->course_name,
+                        "topic_hash" => hash('md5', $course->id),
+                        "topic_total" => 1,
+                        "topic_result" => $trail->is_correct_choice ? 1 : 0,
+                    ]);
+                    array_push($topic_track_index, hash('md5', $course->id));
+                } else {
+                    $index = array_search(hash('md5', $course->id), $topic_track_index);
+                    $topic[$index]["topic_total"] += 1;
+                    if ($trail->is_correct_choice)
+                        $topic[$index]["topic_result"] =  $topic[$index]["topic_result"] + 1;
+                }
+            }
 
             if (in_array($trail->trail_count, $trail_list)) {
                 $index = array_search($trail->trail_count, $trail_list);
@@ -613,6 +613,6 @@ class QuizController extends Controller
             }
         }
 
-        return $trail_result;
+        return ["trail_result" => $trail_result, "topic_result" => $topic];
     }
 }

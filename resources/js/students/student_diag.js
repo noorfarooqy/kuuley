@@ -11,6 +11,7 @@ var app = new Vue({
         Quizerrors: [],
         Server: new Server(),
         Questions: [],
+        topic_results: [],
         Answer: {
             question_id: null,
             answer: null,
@@ -46,8 +47,9 @@ var app = new Vue({
             this.Server.serverRequest('/api/student/quiz/diag', this.setQuizQuestions, this.showErrors);
         },
         setQuizQuestions(data) {
-            this.Questions = data[0];
-            this.SubmittedResults = data[1];
+            this.Questions = data.questions;
+            this.SubmittedResults = data.results.trail_results;
+            this.topic_results = data.results.topic_results;
             this.ToggleLoader();
         },
         showErrors(error) {

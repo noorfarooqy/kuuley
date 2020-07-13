@@ -2,6 +2,7 @@
 
 namespace App\models\quiz;
 
+use App\models\courses\CoursesModel;
 use App\models\students\QuestionResultsModel;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
@@ -23,6 +24,10 @@ class QuestionsModel extends Model
     public $singChoiceQuestion = 2;
     public $multiChoiceQuestion = 3;
 
+    public function questionQuiz()
+    {
+        return $this->belongsTo(QuizesModel::class, 'quiz_id', 'id');
+    }
     public function NewTrueOrFalseQuestion($data, $quiz_id)
     {
         try {
@@ -73,6 +78,11 @@ class QuestionsModel extends Model
     public function Answers()
     {
         return $this->hasMany(AnswersModel::class, 'question_id', 'id');
+    }
+
+    public function CourseRelated()
+    {
+        return $this->belongsTo(CoursesModel::class, 'question_topic', 'id');
     }
 
     public function ResultsSubmitted()
